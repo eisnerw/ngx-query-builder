@@ -1,0 +1,37 @@
+<main class="main">
+  <div class="content">
+    <div class="row panel" style="flex-direction: column">
+      <div class="row">
+        <label>Control Valid (Vanilla): {{ queryCtrl.valid }}</label>
+        <label>Control Touched (Vanilla): {{ queryCtrl.touched }}</label>
+        <label>Rules Limit: <input type="number" class="num" value="0" (change)=changeRulesLimit($event)></label>
+        <label>Level Limit: <input type="number" class="num" value="0" (change)=changeLevelLimit($event)></label>
+      </div>
+      <div class="row">
+        <div>
+          <label><input type="checkbox" checked (change)=switchModes($event)>Entity Mode</label>
+        </div>
+        <div>
+          <label><input type="checkbox" [(ngModel)]='allowRuleset'>Allow Ruleset</label>
+        </div>
+        <div>
+          <label><input type="checkbox" [(ngModel)]='allowCollapse'>Allow Collapse</label>
+        </div>
+        <div>
+          <label><input type="checkbox" [(ngModel)]='persistValueOnFieldChange'>Persist Values on Field Change</label>
+        </div>
+        <div>
+          <label><input type="checkbox" (change)=changeDisabled($event)>Disabled</label>
+        </div>
+      </div>
+
+      <textarea class="output">{{query | json}}</textarea>
+    </div>
+    <ngx-query-builder [formControl]='queryCtrl' [config]='currentConfig' [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse' [persistValueOnFieldChange]='persistValueOnFieldChange'>
+      <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+      <textarea class="text-input text-area" [(ngModel)]="rule.value" [disabled]=getDisabledState()
+                placeholder="Custom Textarea"></textarea>
+      </ng-container>
+    </ngx-query-builder>
+  </div>
+</main>
