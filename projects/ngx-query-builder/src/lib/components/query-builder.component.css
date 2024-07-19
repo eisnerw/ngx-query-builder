@@ -13,6 +13,7 @@
   }
 
   .q-rule {
+    background: white;
     display: flex;
     gap: 10px;
 
@@ -169,15 +170,6 @@
     text-align: center;
   }
 
-  .q-ruleset {
-    border: 1px solid #CCC;
-  }
-
-  .q-rule {
-    border: 1px solid #CCC;
-    background: white;
-  }
-
   .q-transition {
     -webkit-transition: all 0.1s ease-in-out;
     -moz-transition:    all 0.1s ease-in-out;
@@ -201,6 +193,7 @@
   }
 
   .q-row {
+    border: 1px solid #CCC;
     padding: 6px 8px;
     margin-top: 6px;
   }

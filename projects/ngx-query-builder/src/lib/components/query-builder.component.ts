@@ -686,11 +686,18 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   getQueryItemClassName(local: LocalRuleMeta): string {
     let cls = this.getClassNames('row', 'connector', 'transition');
-    cls += ' ' + this.getClassNames(local.ruleset ? 'ruleSet' : 'rule');
     if (local.invalid) {
       cls += ' ' + this.getClassNames('invalidRuleSet');
     }
     return cls;
+  }
+
+  getQueryRulesetClassName(): string {
+    return this.getClassNames('ruleSet');
+  }
+
+  getQueryRuleClassName(): string {
+    return this.getClassNames('rule');
   }
 
   getButtonGroupContext(): ButtonGroupContext {
