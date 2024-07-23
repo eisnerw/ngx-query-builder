@@ -7,7 +7,6 @@ module.exports = tseslint.config(
   {
     files: ["**/*.ts"],
     rules: {
-      "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@angular-eslint/directive-selector": "off",
       "@angular-eslint/component-selector": "off",

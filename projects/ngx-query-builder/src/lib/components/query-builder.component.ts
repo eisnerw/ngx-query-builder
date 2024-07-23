@@ -190,11 +190,12 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       });
       if (config.entities) {
         this.entities = Object.keys(config.entities).map((value) => {
-          // @ts-ignore
-          const entity = config.entities[value];
-          entity.value = entity.value || value;
+          const entity = config.entities?.[value];
+          if (entity) {
+            entity.value = entity.value || value;
+          }
           return entity;
-        });
+        }).filter((entity) => entity !== undefined) as Entity[];
       } else {
         this.entities = [];
       }
@@ -208,22 +209,18 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   validate(): ValidationErrors | null {
     const errors: Record<string, any> = {};
-    // @ts-ignore
-    const ruleErrorStore = [];
+    const ruleErrorStore: any[] = [];
     let hasErrors = false;
 
     if (!this.config.allowEmptyRulesets && this.checkEmptyRuleInRuleset(this.data)) {
-      // @ts-ignore
-      errors.empty = 'Empty rulesets are not allowed.';
+      errors['empty'] = 'Empty rulesets are not allowed.';
       hasErrors = true;
     }
 
-    // @ts-ignore
     this.validateRulesInRuleset(this.data, ruleErrorStore);
 
     if (ruleErrorStore.length) {
-      // @ts-ignore
-      errors.rules = ruleErrorStore;
+      errors['rules'] = ruleErrorStore;
       hasErrors = true;
     }
     return hasErrors ? errors : null;
@@ -264,9 +261,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return this.disabled;
   }
 
-  // @ts-ignore
-  findTemplateForRule(rule: Rule): TemplateRef<any> {
-    // @ts-ignore
+  findTemplateForRule(rule: Rule): TemplateRef<any> | undefined {
     const type = this.getInputType(rule.field, rule.operator);
     if (type) {
       const queryInput = this.findQueryInput(type);
@@ -276,15 +271,13 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         if (this.defaultTemplateTypes.indexOf(type) === -1) {
           console.warn(`Could not find template for field with type: ${type}`);
         }
-        // @ts-ignore
-        return null;
       }
     }
+    return undefined;
   }
 
-  findQueryInput(type: string): QueryInputDirective {
+  findQueryInput(type: string): QueryInputDirective | undefined {
     const templates = this.parentInputTemplates || this.inputTemplates;
-    // @ts-ignore
     return (templates||[]).find((item) => item.queryInputType === type);
   }
 
@@ -323,7 +316,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   }
 
   getFields(entity: string): Field[] {
-    if (this.entities && entity) {
+    if (this.entities && this.entities.length > 0 && entity) {
       return this.fields.filter((field) => {
         return field && field.entity === entity;
       });
@@ -332,7 +325,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
   }
 
-  getInputType(field: string, operator: string): string {
+  getInputType(field: string, operator: string): string | undefined {
     if (this.config.getInputType) {
       return this.config.getInputType(field, operator);
     }
@@ -345,8 +338,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     switch (operator) {
       case 'is null':
       case 'is not null':
-        // @ts-ignore
-        return null;  // No displayed component
+        return undefined;  // No displayed component
       case 'in':
       case 'not in':
         return type === 'category' || type === 'boolean' ? 'multiselect' : type;
@@ -362,19 +354,15 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return this.config.fields[field].options || this.defaultEmptyList;
   }
 
-  // @ts-ignore
-  getClassNames(...args): string {
+  getClassNames(...args: any[]): string | undefined {
     const clsLookup = this.classNames ? this.classNames : this.defaultClassNames;
-    // @ts-ignore
-    const classNames = args.map((id) => clsLookup[id] || this.defaultClassNames[id]).filter((c) => !!c);
-    // @ts-ignore
-    return classNames.length ? classNames.join(' ') : null;
+    const classNames = args.map((id) => (clsLookup as any)[id] || (this.defaultClassNames as any)[id]).filter((c) => !!c);
+    return classNames.length ? classNames.join(' ') : undefined;
   }
 
-  getDefaultField(entity: Entity): Field {
+  getDefaultField(entity: Entity | undefined): Field | undefined {
     if (!entity) {
-      // @ts-ignore
-      return null;
+      return undefined;
     } else if (entity.defaultField !== undefined) {
       return this.getDefaultValue(entity.defaultField);
     } else {
@@ -386,25 +374,22 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       } else {
         console.warn(`No fields found for entity '${entity.name}'. ` +
           `A 'defaultOperator' is also not specified on the field config. Operator value will default to null.`);
-        // @ts-ignore
-        return null;
+        return undefined;
       }
     }
   }
 
-  getDefaultOperator(field: Field): string {
+  getDefaultOperator(field: Field): string | undefined {
     if (field && field.defaultOperator !== undefined) {
       return this.getDefaultValue(field.defaultOperator);
     } else {
-      // @ts-ignore
-      const operators = field ? this.getOperators(field.value) : [];
+      const operators = field && field.value ? this.getOperators(field.value) : [];
       if (operators && operators.length) {
         return operators[0];
       } else {
         console.warn(`No operators found for field '${field?.value}'. ` +
           `A 'defaultOperator' is also not specified on the field config. Operator value will default to null.`);
-        // @ts-ignore
-        return null;
+        return undefined;
       }
     }
   }
@@ -419,13 +404,14 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       this.config.addRule(parent);
     } else {
       const field = this.fields[0];
-      parent.rules = parent.rules.concat([{
-        // @ts-ignore
-        field: field.value,
-        operator: this.getDefaultOperator(field),
-        value: this.getDefaultValue(field.defaultValue),
-        entity: field.entity
-      }]);
+      if (field.value) {
+        parent.rules = parent.rules.concat([{
+          field: field.value,
+          operator: this.getDefaultOperator(field) || '',
+          value: this.getDefaultValue(field.defaultValue),
+          entity: field.entity
+        } as Rule] as Rule[]);
+      }
     }
 
     this.handleTouched();
@@ -520,10 +506,8 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
 
     if (this.config.coerceValueForOperator) {
-      // @ts-ignore
       rule.value = this.config.coerceValueForOperator(rule.operator, rule.value, rule);
     } else {
-      // @ts-ignore
       rule.value = this.coerceValueForOperator(rule.operator, rule.value, rule);
     }
 
@@ -532,7 +516,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   }
 
   coerceValueForOperator(operator: string, value: any, rule: Rule): any {
-    const inputType: string = this.getInputType(rule.field, operator);
+    const inputType: string | undefined = this.getInputType(rule.field, operator);
     if (inputType === 'multiselect' && !Array.isArray(value)) {
       return [value];
     }
@@ -559,7 +543,6 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     const nextField: Field = this.config.fields[fieldValue];
 
     const nextValue = this.calculateFieldChangeValue(
-      // @ts-ignore
       currentField, nextField, rule.value);
 
     if (nextValue !== undefined) {
@@ -568,7 +551,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       delete rule.value;
     }
 
-    rule.operator = this.getDefaultOperator(nextField);
+    rule.operator = this.getDefaultOperator(nextField) || '';
 
     // Create new context objects so templates will automatically update
     this.inputContextCache.delete(rule);
@@ -590,19 +573,16 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
     let i = index;
     let rs = data;
-    // @ts-ignore
-    const entity: Entity = this.entities.find((e) => e.value === entityValue);
-    const defaultField: Field = this.getDefaultField(entity);
+    const entity: Entity | undefined = this.entities.find((e) => e?.value === entityValue);
+    const defaultField: Field | undefined = this.getDefaultField(entity);
     if (!rs) {
       rs = this.data;
       i = rs.rules.findIndex((x) => x === rule);
     }
-    // @ts-ignore
-    rule.field = defaultField.value;
+    rule.field = defaultField && defaultField.value || '';
     rs.rules[i] = rule;
     if (defaultField) {
-      // @ts-ignore
-      this.changeField(defaultField.value, rule);
+      this.changeField(rule.field, rule);
     } else {
       this.handleTouched();
       this.handleDataChange();
@@ -618,73 +598,62 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
   }
 
-  getOperatorTemplate(): TemplateRef<any> {
+  getOperatorTemplate(): TemplateRef<any> | undefined {
     const t = this.parentOperatorTemplate || this.operatorTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getFieldTemplate(): TemplateRef<any> {
+  getFieldTemplate(): TemplateRef<any> | undefined {
     const t = this.parentFieldTemplate || this.fieldTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getEntityTemplate(): TemplateRef<any> {
+  getEntityTemplate(): TemplateRef<any> | undefined {
     const t = this.parentEntityTemplate || this.entityTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getArrowIconTemplate(): TemplateRef<any> {
+  getArrowIconTemplate(): TemplateRef<any> | undefined {
     const t = this.parentArrowIconTemplate || this.arrowIconTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getButtonGroupTemplate(): TemplateRef<any> {
+  getButtonGroupTemplate(): TemplateRef<any> | undefined {
     const t = this.parentButtonGroupTemplate || this.buttonGroupTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getSwitchGroupTemplate(): TemplateRef<any> {
+  getSwitchGroupTemplate(): TemplateRef<any> | undefined {
     const t = this.parentSwitchGroupTemplate || this.switchGroupTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getRulesetAddRuleButtonTemplate(): TemplateRef<any> {
+  getRulesetAddRuleButtonTemplate(): TemplateRef<any> | undefined {
     const t = this.parentRulesetAddRuleButtonTemplate || this.rulesetAddRuleButtonTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getRulesetAddRulesetButtonTemplate(): TemplateRef<any> {
+  getRulesetAddRulesetButtonTemplate(): TemplateRef<any> | undefined {
     const t = this.parentRulesetAddRulesetButtonTemplate || this.rulesetAddRulesetButtonTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getRulesetRemoveButtonTemplate(): TemplateRef<any> {
+  getRulesetRemoveButtonTemplate(): TemplateRef<any> | undefined {
     const t = this.parentRulesetRemoveButtonTemplate || this.rulesetRemoveButtonTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getRuleRemoveButtonTemplate(): TemplateRef<any> {
+  getRuleRemoveButtonTemplate(): TemplateRef<any> | undefined {
     const t = this.parentRuleRemoveButtonTemplate || this.ruleRemoveButtonTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getEmptyWarningTemplate(): TemplateRef<any> {
+  getEmptyWarningTemplate(): TemplateRef<any> | undefined {
     const t = this.parentEmptyWarningTemplate || this.emptyWarningTemplate;
-    // @ts-ignore
-    return t ? t.template : null;
+    return t?.template;
   }
 
-  getQueryItemClassName(local: LocalRuleMeta): string {
+  getQueryItemClassName(local: LocalRuleMeta): string | undefined {
     let cls = this.getClassNames('row', 'connector', 'transition');
     if (local.invalid) {
       cls += ' ' + this.getClassNames('invalidRuleSet');
@@ -692,11 +661,11 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return cls;
   }
 
-  getQueryRulesetClassName(): string {
+  getQueryRulesetClassName(): string | undefined {
     return this.getClassNames('ruleSet');
   }
 
-  getQueryRuleClassName(): string {
+  getQueryRuleClassName(): string | undefined {
     return this.getClassNames('rule');
   }
 
@@ -705,9 +674,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       this.buttonGroupContext = {
         parentValue: this.parentValue,
         addRule: this.addRule.bind(this),
-        // @ts-ignore
         addRuleSet: this.allowRuleset && this.addRuleSet.bind(this),
-        // @ts-ignore
         removeRuleSet: this.allowRuleset && this.parentValue && this.removeRuleSet.bind(this),
         getDisabledState: this.getDisabledState,
         $implicit: this.data
@@ -716,7 +683,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return this.buttonGroupContext;
   }
 
-  getRulesetAddRuleButtonContext(rule: Rule): RulesetAddRuleButtonContext {
+  getRulesetAddRuleButtonContext(rule: Rule): RulesetAddRuleButtonContext | undefined {
     if (!this.rulesetAddRuleButtonContextCache.has(rule)) {
       this.rulesetAddRuleButtonContextCache.set(rule, {
         addRule: this.addRule.bind(this),
@@ -724,11 +691,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         $implicit: rule
       });
     }
-    // @ts-ignore
     return this.rulesetAddRuleButtonContextCache.get(rule);
   }
 
-  getRulesetAddRulesetButtonContext(rule: Rule): RulesetAddRulesetButtonContext {
+  getRulesetAddRulesetButtonContext(rule: Rule): RulesetAddRulesetButtonContext | undefined {
     if (!this.rulesetAddRulesetButtonContextCache.has(rule)) {
       this.rulesetAddRulesetButtonContextCache.set(rule, {
         addRuleSet: this.addRuleSet.bind(this),
@@ -736,11 +702,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         $implicit: rule
       });
     }
-    // @ts-ignore
     return this.rulesetAddRulesetButtonContextCache.get(rule);
   }
 
-  getRulesetRemoveButtonContext(rule: Rule): RulesetRemoveButtonContext {
+  getRulesetRemoveButtonContext(rule: Rule): RulesetRemoveButtonContext | undefined {
     if (!this.rulesetRemoveButtonContextCache.has(rule)) {
       this.rulesetRemoveButtonContextCache.set(rule, {
         removeRuleSet: this.removeRuleSet.bind(this),
@@ -748,11 +713,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         $implicit: rule
       });
     }
-    // @ts-ignore
     return this.rulesetRemoveButtonContextCache.get(rule);
   }
 
-  getRuleRemoveButtonContext(rule: Rule): RuleRemoveButtonContext {
+  getRuleRemoveButtonContext(rule: Rule): RuleRemoveButtonContext | undefined {
     if (!this.ruleRemoveButtonContextCache.has(rule)) {
       this.ruleRemoveButtonContextCache.set(rule, {
         removeRule: this.removeRule.bind(this),
@@ -760,11 +724,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         $implicit: rule
       });
     }
-    // @ts-ignore
     return this.ruleRemoveButtonContextCache.get(rule);
   }
 
-  getFieldContext(rule: Rule): FieldContext {
+  getFieldContext(rule: Rule): FieldContext | undefined {
     if (!this.fieldContextCache.has(rule)) {
       this.fieldContextCache.set(rule, {
         onChange: this.changeField.bind(this),
@@ -774,21 +737,18 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         $implicit: rule
       });
     }
-    // @ts-ignore
     return this.fieldContextCache.get(rule);
   }
 
-  getEntityContext(rule: Rule): EntityContext {
+  getEntityContext(rule: Rule): EntityContext | undefined {
     if (!this.entityContextCache.has(rule)) {
       this.entityContextCache.set(rule, {
-        // @ts-ignore
         onChange: this.changeEntity.bind(this),
         getDisabledState: this.getDisabledState,
         entities: this.entities,
         $implicit: rule
       });
     }
-    // @ts-ignore
     return this.entityContextCache.get(rule);
   }
 
@@ -815,21 +775,19 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     };
   }
 
-  getOperatorContext(rule: Rule): OperatorContext {
+  getOperatorContext(rule: Rule): OperatorContext | undefined {
     if (!this.operatorContextCache.has(rule)) {
       this.operatorContextCache.set(rule, {
-        // @ts-ignore
         onChange: this.changeOperator.bind(this),
         getDisabledState: this.getDisabledState,
         operators: this.getOperators(rule.field),
         $implicit: rule
       });
     }
-    // @ts-ignore
     return this.operatorContextCache.get(rule);
   }
 
-  getInputContext(rule: Rule): InputContext {
+  getInputContext(rule: Rule): InputContext | undefined {
     if (!this.inputContextCache.has(rule)) {
       this.inputContextCache.set(rule, {
         onChange: this.changeInput.bind(this),
@@ -839,7 +797,6 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         $implicit: rule
       });
     }
-    // @ts-ignore
     return this.inputContextCache.get(rule);
   }
 
@@ -856,18 +813,18 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   }
 
   private calculateFieldChangeValue(
-    currentField: Field,
-    nextField: Field,
+    currentField: Field | undefined,
+    nextField: Field | undefined,
     currentValue: any
   ): any {
 
-    if (this.config.calculateFieldChangeValue != null) {
+    if (this.config.calculateFieldChangeValue) {
       return this.config.calculateFieldChangeValue(
         currentField, nextField, currentValue);
     }
 
     const canKeepValue = () => {
-      if (currentField == null || nextField == null) {
+      if (!currentField || !nextField) {
         return false;
       }
       return currentField.type === nextField.type
@@ -889,10 +846,9 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     if (!ruleset || !ruleset.rules || ruleset.rules.length === 0) {
       return true;
     } else {
-      // @ts-ignore
-      return ruleset.rules.some((item: RuleSet) => {
-        if (item.rules) {
-          return this.checkEmptyRuleInRuleset(item);
+      return ruleset.rules.some((item: RuleSet | Rule) => {
+        if ((item as RuleSet).rules) {
+          return this.checkEmptyRuleInRuleset(item as RuleSet);
         } else {
           return false;
         }
@@ -907,8 +863,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
           return this.validateRulesInRuleset(item as RuleSet, errorStore);
         } else if ((item as Rule).field) {
           const field = this.config.fields[(item as Rule).field];
-          // @ts-ignore
-          if (field && field.validator && field.validator.apply) {
+          if (field && field.validator) {
             const error = field.validator(item as Rule, ruleset);
             if (error != null) {
               errorStore.push(error);

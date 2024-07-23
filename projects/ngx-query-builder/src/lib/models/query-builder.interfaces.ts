@@ -7,9 +7,9 @@ export interface RuleSet {
 
 export interface Rule {
   field: string;
-  value?: any;
-  operator?: string;
+  operator: string;
   entity?: string;
+  value?: any;
 }
 
 export interface Option {
@@ -96,8 +96,8 @@ export interface QueryBuilderConfig {
   removeRuleSet?: (ruleset: RuleSet, parent: RuleSet) => void;
   removeRule?: (rule: Rule, parent: RuleSet) => void;
   coerceValueForOperator?: (operator: string, value: any, rule: Rule) => any;
-  calculateFieldChangeValue?: (currentField: Field,
-                               nextField: Field,
+  calculateFieldChangeValue?: (currentField: Field | undefined,
+                               nextField: Field | undefined,
                                currentValue: any) => any;
 }
 
@@ -119,7 +119,7 @@ export interface ArrowIconContext {
 }
 
 export interface EntityContext {
-  onChange: (entityValue: string, rule: Rule) => void;
+  onChange: any;
   getDisabledState: () => boolean;
   entities: Entity[];
   $implicit: Rule;
@@ -134,7 +134,7 @@ export interface FieldContext {
 }
 
 export interface OperatorContext {
-  onChange: () => void;
+  onChange: any;
   getDisabledState: () => boolean;
   operators: string[];
   $implicit: Rule;
@@ -149,9 +149,10 @@ export interface InputContext {
 }
 
 export interface ButtonGroupContext {
-  addRule: () => void;
-  addRuleSet: () => void;
-  removeRuleSet: () => void;
+  parentValue: RuleSet;
+  addRule: any;
+  addRuleSet: any;
+  removeRuleSet: any;
   getDisabledState: () => boolean;
   $implicit: RuleSet;
 }
