@@ -473,7 +473,9 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   }
 
   transitionEnd(): void {
-    this.treeContainer.nativeElement.style.maxHeight = null;
+    if (this.treeContainer) {
+      this.treeContainer.nativeElement.style.maxHeight = null;
+    }
   }
 
   toggleCollapse(): void {
@@ -484,7 +486,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   }
 
   computedTreeContainerHeight(): void {
-    const nativeElement: HTMLElement = this.treeContainer.nativeElement;
+    const nativeElement: HTMLElement = this.treeContainer?.nativeElement;
     if (nativeElement && nativeElement.firstElementChild) {
       nativeElement.style.maxHeight = (nativeElement.firstElementChild.clientHeight + 8) + 'px';
     }
