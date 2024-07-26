@@ -197,6 +197,10 @@
     margin: 4px 0 2px;
   }
 
+  .q-tree:empty {
+    margin: 0px;
+  }
+
   .q-row {
     margin-top: 6px;
   }
