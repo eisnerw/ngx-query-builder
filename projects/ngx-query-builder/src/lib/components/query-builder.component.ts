@@ -653,16 +653,16 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return t?.template;
   }
 
-  getQueryItemClassName(local: LocalRuleMeta): string | undefined {
-    let cls = this.getClassNames('row', 'connector', 'transition');
+  getQueryItemClassName(): string | undefined {
+    return this.getClassNames('row', 'connector', 'transition');
+  }
+
+  getQueryRulesetClassName(local: LocalRuleMeta): string | undefined {
+    let cls = this.getClassNames('ruleSet');
     if (local.invalid) {
       cls += ' ' + this.getClassNames('invalidRuleSet');
     }
     return cls;
-  }
-
-  getQueryRulesetClassName(): string | undefined {
-    return this.getClassNames('ruleSet');
   }
 
   getQueryRuleClassName(): string | undefined {

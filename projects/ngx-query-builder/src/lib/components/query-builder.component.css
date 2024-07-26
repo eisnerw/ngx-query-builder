@@ -2,36 +2,32 @@
   display: block;
   width: 100%;
 
-  .q-switch-row {
-    display: flex;
-    gap: 10px;
-  }
-
   .q-icon {
     font-style: normal;
     font-size: 12px;
   }
 
-  .q-rule {
-    background: white;
-    display: flex;
-    gap: 10px;
-
-    .q-rule-content {
-      flex: 1;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .q-rule-actions {
-      flex-shrink: 0;
-    }
-  }
-
   .q-remove-icon {
     &::before {
       content: '❌'
+    }
+  }
+
+  .q-switch-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .q-add-icon {
+    color: #555;
+    &::before {
+      content: '➕'
+    }
+  }
+
+  .q-arrow-icon {
+    &::before {
+      content: '▶'
     }
   }
 
@@ -43,19 +39,6 @@
 
     &.q-collapsed {
       transform: rotate(0);
-    }
-  }
-
-  .q-arrow-icon {
-    &::before {
-      content: '▶'
-    }
-  }
-
-  .q-add-icon {
-    color: #555;
-    &::before {
-      content: '➕'
     }
   }
 
@@ -160,6 +143,28 @@
     }
   }
 
+  .q-rule, .q-ruleset {
+    border: 1px solid #CCC;
+    padding: 6px 8px;
+  }
+
+  .q-rule {
+    background: white;
+    display: flex;
+    gap: 10px;
+
+    .q-rule-content {
+      flex: 1;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .q-rule-actions {
+      flex-shrink: 0;
+    }
+  }
+
   .q-invalid-ruleset {
     border: 1px solid rgba(179, 65, 93, 0.5) !important;
     background: rgba(179, 65, 93, 0.1) !important;
@@ -193,8 +198,6 @@
   }
 
   .q-row {
-    border: 1px solid #CCC;
-    padding: 6px 8px;
     margin-top: 6px;
   }
 

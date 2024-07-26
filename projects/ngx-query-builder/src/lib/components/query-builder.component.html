@@ -1,62 +1,61 @@
-<div [ngClass]="getQueryRulesetClassName()">
-  <div [ngClass]="getClassNames('switchRow')">
-    <a *ngIf="allowCollapse" (click)="toggleCollapse()" [ngClass]="getClassNames('arrowIconButton', data.collapsed ? 'collapsed' : null)">
-      <ng-template [ngTemplateOutlet]="_arrowIconTpl"/>
-    </a>
+<ng-container *ngIf="{ruleset: isRuleset(data), invalid: !config.allowEmptyRulesets && isEmptyRuleset(data)} as local">
+  <div [ngClass]="getQueryRulesetClassName(local)">
+    <div [ngClass]="getClassNames('switchRow')">
+      <a *ngIf="allowCollapse" (click)="toggleCollapse()" [ngClass]="getClassNames('arrowIconButton', data.collapsed ? 'collapsed' : null)">
+        <ng-template [ngTemplateOutlet]="_arrowIconTpl"/>
+      </a>
 
-    <ng-template [ngTemplateOutlet]="_switchGroupTpl"/>
+      <ng-template [ngTemplateOutlet]="_switchGroupTpl"/>
 
-    <ng-template [ngTemplateOutlet]="_buttonGroupTpl"/>
-  </div>
+      <ng-template [ngTemplateOutlet]="_buttonGroupTpl"/>
+    </div>
 
-  <div [ngClass]="getClassNames('treeContainer', data.collapsed ? 'collapsed' : null)" (transitionend)="transitionEnd()" #treeContainer>
-    <ul [ngClass]="getClassNames('tree')" *ngIf="data && data.rules">
-      <ng-container *ngFor="let rule of data.rules;let i = index">
-        <ng-container *ngIf="(!config.rulesLimit || i < config.rulesLimit) && {ruleset: isRuleset(rule), invalid: !config.allowEmptyRulesets && isEmptyRuleset(rule)} as local">
-          <li [ngClass]="getQueryItemClassName(local)" *ngIf="isRule(rule) || (!config.levelLimit || level + 1 < config.levelLimit)">
-            <ng-container *ngIf="isRule(rule)">
+    <div [ngClass]="getClassNames('treeContainer', data.collapsed ? 'collapsed' : null)" (transitionend)="transitionEnd()" #treeContainer>
+      <ul [ngClass]="getClassNames('tree')" *ngIf="data && data.rules">
+        <ng-container *ngFor="let rule of data.rules;let i = index">
+          <ng-container *ngIf="!config.rulesLimit || i < config.rulesLimit">
+            <li [ngClass]="getQueryItemClassName()" *ngIf="isRule(rule) || (!config.levelLimit || level + 1 < config.levelLimit)">
+              <ng-container *ngIf="isRule(rule)">
+                <div [ngClass]="getQueryRuleClassName()">
+                  <div [ngClass]="getClassNames('ruleContent')">
+                    <div *ngIf="entities && entities.length > 0" class="q-inline-block-display">
+                      <ng-template [ngTemplateOutlet]="_entityTpl" [ngTemplateOutletContext]="{ $implicit: rule, index: i }"/>
+                    </div>
 
-              <div [ngClass]="getQueryRuleClassName()">
-                <div [ngClass]="getClassNames('ruleContent')">
-                  <div *ngIf="entities && entities.length > 0" class="q-inline-block-display">
-                    <ng-template [ngTemplateOutlet]="_entityTpl" [ngTemplateOutletContext]="{ $implicit: rule, index: i }"/>
+                    <ng-template [ngTemplateOutlet]="_fieldTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
+
+                    <ng-template [ngTemplateOutlet]="_operatorTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
+
+                    <ng-template [ngTemplateOutlet]="_inputTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
                   </div>
 
-                  <ng-template [ngTemplateOutlet]="_fieldTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
-
-                  <ng-template [ngTemplateOutlet]="_operatorTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
-
-                  <ng-template [ngTemplateOutlet]="_inputTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
+                  <div [ngClass]="getClassNames('ruleActions')">
+                    <ng-template [ngTemplateOutlet]="_ruleRemoveButtonTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
+                  </div>
                 </div>
+              </ng-container>
 
-                <div [ngClass]="getClassNames('ruleActions')">
-                  <ng-template [ngTemplateOutlet]="_ruleRemoveButtonTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
-                </div>
-              </div>
-
-            </ng-container>
-
-            <ngx-query-builder *ngIf="isRuleset(rule)" [data]="rule" [level]="level + 1" [disabled]="disabled" [parentTouchedCallback]="parentTouchedCallback || onTouchedCallback"
-                               [parentChangeCallback]="parentChangeCallback || onChangeCallback" [parentInputTemplates]="parentInputTemplates || inputTemplates"
-                               [parentOperatorTemplate]="parentOperatorTemplate || operatorTemplate" [parentFieldTemplate]="parentFieldTemplate || fieldTemplate"
-                               [parentEntityTemplate]="parentEntityTemplate || entityTemplate" [parentSwitchGroupTemplate]="parentSwitchGroupTemplate || switchGroupTemplate"
-                               [parentButtonGroupTemplate]="parentButtonGroupTemplate || buttonGroupTemplate"
-                               [parentRulesetAddRuleButtonTemplate]="parentRulesetAddRuleButtonTemplate || rulesetAddRuleButtonTemplate"
-                               [parentRulesetAddRulesetButtonTemplate]="parentRulesetAddRulesetButtonTemplate || rulesetAddRulesetButtonTemplate"
-                               [parentRulesetRemoveButtonTemplate]="parentRulesetRemoveButtonTemplate || rulesetRemoveButtonTemplate"
-                               [parentRuleRemoveButtonTemplate]="parentRuleRemoveButtonTemplate || ruleRemoveButtonTemplate"
-                               [parentEmptyWarningTemplate]="parentEmptyWarningTemplate || emptyWarningTemplate" [parentArrowIconTemplate]="parentArrowIconTemplate || arrowIconTemplate"
-                               [parentValue]="data" [classNames]="classNames" [config]="config" [allowRuleset]="allowRuleset"
-                               [allowCollapse]="allowCollapse" [emptyMessage]="emptyMessage" [operatorMap]="operatorMap">
-            </ngx-query-builder>
-
-            <ng-template [ngTemplateOutlet]="_emptyWarningTpl" [ngTemplateOutletContext]="{ $implicit: local }"/>
-          </li>
+              <ngx-query-builder *ngIf="isRuleset(rule)" [data]="rule" [level]="level + 1" [disabled]="disabled" [parentTouchedCallback]="parentTouchedCallback || onTouchedCallback"
+                                 [parentChangeCallback]="parentChangeCallback || onChangeCallback" [parentInputTemplates]="parentInputTemplates || inputTemplates"
+                                 [parentOperatorTemplate]="parentOperatorTemplate || operatorTemplate" [parentFieldTemplate]="parentFieldTemplate || fieldTemplate"
+                                 [parentEntityTemplate]="parentEntityTemplate || entityTemplate" [parentSwitchGroupTemplate]="parentSwitchGroupTemplate || switchGroupTemplate"
+                                 [parentButtonGroupTemplate]="parentButtonGroupTemplate || buttonGroupTemplate"
+                                 [parentRulesetAddRuleButtonTemplate]="parentRulesetAddRuleButtonTemplate || rulesetAddRuleButtonTemplate"
+                                 [parentRulesetAddRulesetButtonTemplate]="parentRulesetAddRulesetButtonTemplate || rulesetAddRulesetButtonTemplate"
+                                 [parentRulesetRemoveButtonTemplate]="parentRulesetRemoveButtonTemplate || rulesetRemoveButtonTemplate"
+                                 [parentRuleRemoveButtonTemplate]="parentRuleRemoveButtonTemplate || ruleRemoveButtonTemplate"
+                                 [parentEmptyWarningTemplate]="parentEmptyWarningTemplate || emptyWarningTemplate" [parentArrowIconTemplate]="parentArrowIconTemplate || arrowIconTemplate"
+                                 [parentValue]="data" [classNames]="classNames" [config]="config" [allowRuleset]="allowRuleset"
+                                 [allowCollapse]="allowCollapse" [emptyMessage]="emptyMessage" [operatorMap]="operatorMap">
+              </ngx-query-builder>
+            </li>
+          </ng-container>
         </ng-container>
-      </ng-container>
-    </ul>
+      </ul>
+      <ng-template [ngTemplateOutlet]="_emptyWarningTpl" [ngTemplateOutletContext]="{ $implicit: local }"/>
+    </div>
   </div>
-</div>
+</ng-container>
 
 <!--_arrowIconTpl-->
 <ng-template #_arrowIconTpl>
