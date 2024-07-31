@@ -1,0 +1,42 @@
+tasks:
+
+  - name: Run builder
+    command: |
+      gp sync-await setup
+      pnpm watch
+
+  - name: Run demo
+    command: |
+      gp sync-await setup
+      FILE_PATH="./dist/ngx-query-builder/package.json"
+      while true; do
+        if [[ -f "$FILE_PATH" ]]; then
+          pnpm start
+          break
+        else
+          sleep 1
+        fi
+      done
+    openMode: split-right
+
+  - name: Setup
+    init: |
+      pnpm install
+    command: |
+      gp sync-done setup
+      exit 0
+
+vscode:
+  extensions:
+    - Angular.ng-template
+    - editorconfig.editorconfig
+    - dbaeumer.vscode-eslint
+    - stylelint.vscode-stylelint
+    - DavidAnson.vscode-markdownlint
+    - ms-azuretools.vscode-docker
+    - GitHub.vscode-pull-request-github
+
+ports:
+  - port: 4200
+    name: ngx-query-builder demo
+    onOpen: open-browser

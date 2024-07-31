@@ -1,0 +1,32 @@
+{
+  "name": "Hertzbeat DevContainer",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/git-lfs:1.1.0": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      // same extensions as Gitpod, should match /.gitpod.yml
+      "extensions": [
+        "Angular.ng-template",
+        "editorconfig.editorconfig",
+        "dbaeumer.vscode-eslint",
+        "stylelint.vscode-stylelint",
+        "DavidAnson.vscode-markdownlint",
+        "ms-azuretools.vscode-docker",
+        "GitHub.vscode-pull-request-github"
+      ]
+    }
+  },
+  "portsAttributes": {
+    "4200": {
+      "label": "ngx-query-builder demo",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "node -version"
+}
