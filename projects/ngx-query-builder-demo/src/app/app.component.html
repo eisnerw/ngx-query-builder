@@ -1,5 +1,11 @@
 <main class="main">
   <div class="content">
+    <ngx-query-builder [formControl]='queryCtrl' [config]='currentConfig' [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse' [persistValueOnFieldChange]='persistValueOnFieldChange'>
+      <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+      <textarea class="text-input text-area" [(ngModel)]="rule.value" [disabled]=getDisabledState()
+                placeholder="Custom Textarea"></textarea>
+      </ng-container>
+    </ngx-query-builder>
     <div class="row panel" style="flex-direction: column">
       <div class="row">
         <label>Control Valid (Vanilla): {{ queryCtrl.valid }}</label>
@@ -25,13 +31,7 @@
         </div>
       </div>
 
-      <textarea class="output">{{query | json}}</textarea>
+    <textarea class="output">{{query | json}}</textarea>
     </div>
-    <ngx-query-builder [formControl]='queryCtrl' [config]='currentConfig' [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse' [persistValueOnFieldChange]='persistValueOnFieldChange'>
-      <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
-      <textarea class="text-input text-area" [(ngModel)]="rule.value" [disabled]=getDisabledState()
-                placeholder="Custom Textarea"></textarea>
-      </ng-container>
-    </ngx-query-builder>
   </div>
 </main>

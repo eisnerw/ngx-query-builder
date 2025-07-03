@@ -185,6 +185,7 @@
 
   .q-tree-container {
     width: 100%;
+    overflow: hidden;
     transition: ease-in 0.25s max-height;
 
     &.q-collapsed {
