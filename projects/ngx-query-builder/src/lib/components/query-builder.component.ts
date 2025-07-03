@@ -145,6 +145,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   @Input() persistValueOnFieldChange = false;
 
   @ViewChild('treeContainer', {static: true}) treeContainer!: ElementRef;
+  public collapsed = false;
 
   @ContentChild(QueryButtonGroupDirective) buttonGroupTemplate!: QueryButtonGroupDirective;
   @ContentChild(QuerySwitchGroupDirective) switchGroupTemplate!: QuerySwitchGroupDirective;
@@ -481,7 +482,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   toggleCollapse(): void {
     this.computedTreeContainerHeight();
     setTimeout(() => {
-      this.data.collapsed = !this.data.collapsed;
+      this.collapsed = !this.collapsed;
     }, 100);
   }
 

@@ -1,7 +1,7 @@
 <ng-container *ngIf="{ruleset: isRuleset(data), invalid: !config.allowEmptyRulesets && isEmptyRuleset(data)} as local">
   <div [ngClass]="getQueryRulesetClassName(local)">
     <div [ngClass]="getClassNames('switchRow')">
-      <a *ngIf="allowCollapse" (click)="toggleCollapse()" [ngClass]="getClassNames('arrowIconButton', data.collapsed ? 'collapsed' : null)">
+      <a *ngIf="allowCollapse" (click)="toggleCollapse()" [ngClass]="getClassNames('arrowIconButton', collapsed ? 'collapsed' : null)">
         <ng-template [ngTemplateOutlet]="_arrowIconTpl"/>
       </a>
 
@@ -10,7 +10,7 @@
       <ng-template [ngTemplateOutlet]="_buttonGroupTpl"/>
     </div>
 
-    <div [ngClass]="getClassNames('treeContainer', data.collapsed ? 'collapsed' : null)" (transitionend)="transitionEnd()" #treeContainer>
+    <div [ngClass]="getClassNames('treeContainer', collapsed ? 'collapsed' : null)" (transitionend)="transitionEnd()" #treeContainer>
       <ul [ngClass]="getClassNames('tree')" *ngIf="data && data.rules">
         <ng-container *ngFor="let rule of data.rules;let i = index">
           <ng-container *ngIf="!config.rulesLimit || i < config.rulesLimit">
