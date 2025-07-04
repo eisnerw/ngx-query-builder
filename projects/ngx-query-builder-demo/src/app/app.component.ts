@@ -150,12 +150,149 @@ export class AppComponent implements OnInit {
   updateQuery(text: string): void {
     try {
       const val = JSON.parse(text);
-      this.queryCtrl.setValue(val);
-      this.queryTextInvalid = this.queryCtrl.invalid;
+      if (this.validateQuery(val)) {
+        this.queryCtrl.setValue(val);
+        this.queryTextInvalid = this.queryCtrl.invalid;
+      } else {
+        this.queryTextInvalid = true;
+      }
     } catch {
       this.queryTextInvalid = true;
       // ignore invalid JSON
     }
+  }
+
+  private validateQuery(value: any): boolean {
+    return this.validateRuleset(value);
+  }
+
+  private validateRuleset(ruleset: any): boolean {
+    if (!ruleset || typeof ruleset !== 'object' || Array.isArray(ruleset)) {
+      return false;
+    }
+    const keys = Object.keys(ruleset);
+    if (keys.some(k => !['condition', 'rules', 'not'].includes(k))) {
+      return false;
+    }
+    if (!('condition' in ruleset) || !('rules' in ruleset)) {
+      return false;
+    }
+    if (ruleset.condition !== 'and' && ruleset.condition !== 'or') {
+      return false;
+    }
+    if ('not' in ruleset && typeof ruleset.not !== 'boolean') {
+      return false;
+    }
+    if (!Array.isArray(ruleset.rules)) {
+      return false;
+    }
+    if (ruleset.rules.length === 0) {
+      return false;
+    }
+    return ruleset.rules.every((r: any) => {
+      if (r && typeof r === 'object' && 'rules' in r) {
+        return this.validateRuleset(r);
+      } else {
+        return this.validateRule(r);
+      }
+    });
+  }
+
+  private validateRule(rule: any): boolean {
+    if (!rule || typeof rule !== 'object' || Array.isArray(rule)) {
+      return false;
+    }
+    const keys = Object.keys(rule);
+    if (keys.some(k => !['field', 'operator', 'value', 'entity'].includes(k))) {
+      return false;
+    }
+    if (!('field' in rule) || !('operator' in rule) || !('value' in rule)) {
+      return false;
+    }
+
+    const fieldConf = this.currentConfig.fields[rule.field];
+    if (!fieldConf) {
+      return false;
+    }
+
+    const ops = this.getOperatorsForField(rule.field, fieldConf);
+    if (!ops.includes(rule.operator)) {
+      return false;
+    }
+
+    const val = rule.value;
+    switch (fieldConf.type) {
+      case 'string':
+      case 'textarea':
+        if (typeof val !== 'string') {
+          return false;
+        }
+        break;
+      case 'number':
+        if (typeof val !== 'number' || isNaN(val)) {
+          return false;
+        }
+        break;
+      case 'time':
+        if (typeof val !== 'string' || !/^\d{2}:\d{2}(:\d{2})?$/.test(val)) {
+          return false;
+        }
+        break;
+      case 'date':
+        if (!(val instanceof Date) && (typeof val !== 'string' || isNaN(Date.parse(val)))) {
+          return false;
+        }
+        break;
+      case 'category':
+        if (!fieldConf.options || !fieldConf.options.some(o => o.value === val)) {
+          return false;
+        }
+        break;
+      case 'boolean':
+        if (val !== true && val !== false) {
+          return false;
+        }
+        break;
+      case 'multiselect':
+        if (!Array.isArray(val)) {
+          return false;
+        }
+        if (fieldConf.options && val.some((v: any) => !fieldConf.options!.some(o => o.value === v))) {
+          return false;
+        }
+        break;
+    }
+
+    if ('entity' in rule && this.currentConfig.entities && !this.currentConfig.entities[rule.entity]) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private getOperatorsForField(fieldName: string, field: any): string[] {
+    if (this.currentConfig.getOperators) {
+      return this.currentConfig.getOperators(fieldName, field);
+    }
+    let ops: string[] = [];
+    if (field.operators) {
+      ops = field.operators.slice();
+    } else {
+      const map: Record<string, string[]> = {
+        string: ['=', '!=', 'contains', 'like'],
+        number: ['=', '!=', '>', '>=', '<', '<='],
+        time: ['=', '!=', '>', '>=', '<', '<='],
+        date: ['=', '!=', '>', '>=', '<', '<='],
+        category: ['=', '!=', 'in', 'not in'],
+        boolean: ['='],
+        multiselect: ['in', 'not in']
+      };
+      ops = map[field.type] || [];
+    }
+    if (field.nullable) {
+      ops = ops.concat(['is null', 'is not null']);
+    }
+    return ops;
   }
 
   switchModes(event: Event) {
