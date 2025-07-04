@@ -149,10 +149,10 @@ export class AppComponent implements OnInit {
 
   updateQuery(text: string): void {
     try {
-      const val = JSON.parse(text);
+      const val = JSON.parse(text.trim());
       if (this.validateQuery(val)) {
         this.queryCtrl.setValue(val);
-        this.queryTextInvalid = this.queryCtrl.invalid;
+        this.queryTextInvalid = false;
       } else {
         this.queryTextInvalid = true;
       }
