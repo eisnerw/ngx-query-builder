@@ -105,7 +105,7 @@ export interface QueryBuilderConfig {
 export interface SwitchGroupContext {
   onChange: (conditionValue: string) => void;
   onChangeNot: (not: boolean) => void;
-  enableNot: boolean;
+  allowNot: boolean;
   getDisabledState: () => boolean;
   $implicit: RuleSet;
 }
