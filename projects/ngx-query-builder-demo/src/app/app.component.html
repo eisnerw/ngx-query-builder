@@ -34,7 +34,7 @@
         </div>
       </div>
 
-    <textarea class="output" [(ngModel)]="queryText" (ngModelChange)="updateQuery($event)"></textarea>
+    <textarea class="output" [ngClass]="{'invalid': queryTextInvalid}" [(ngModel)]="queryText" (ngModelChange)="updateQuery($event)"></textarea>
     </div>
   </div>
 </main>

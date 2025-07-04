@@ -11,6 +11,7 @@ import { QueryBuilderClassNames, QueryBuilderConfig } from 'ngx-query-builder';
 export class AppComponent implements OnInit {
   public queryCtrl: FormControl;
   public queryText: string = '';
+  public queryTextInvalid = false;
 
   public bootstrapClassNames: QueryBuilderClassNames = {
     removeIcon: 'fa fa-minus',
@@ -136,11 +137,13 @@ export class AppComponent implements OnInit {
     this.queryCtrl = this.formBuilder.control(this.query);
     this.currentConfig = this.entityConfig;
     this.queryText = JSON.stringify(this.queryCtrl.value, null, 2);
+    this.queryTextInvalid = this.queryCtrl.invalid;
   }
 
   ngOnInit(): void {
     this.queryCtrl.valueChanges.subscribe(value => {
       this.queryText = JSON.stringify(value, null, 2);
+      this.queryTextInvalid = this.queryCtrl.invalid;
     });
   }
 
@@ -148,7 +151,9 @@ export class AppComponent implements OnInit {
     try {
       const val = JSON.parse(text);
       this.queryCtrl.setValue(val);
+      this.queryTextInvalid = this.queryCtrl.invalid;
     } catch {
+      this.queryTextInvalid = true;
       // ignore invalid JSON
     }
   }
