@@ -137,13 +137,13 @@ export class AppComponent implements OnInit {
     this.queryCtrl = this.formBuilder.control(this.query);
     this.currentConfig = this.entityConfig;
     this.queryText = JSON.stringify(this.queryCtrl.value, null, 2);
-    this.queryTextInvalid = this.queryCtrl.invalid;
+    this.queryTextInvalid = !this.validateQuery(this.queryCtrl.value);
   }
 
   ngOnInit(): void {
     this.queryCtrl.valueChanges.subscribe(value => {
       this.queryText = JSON.stringify(value, null, 2);
-      this.queryTextInvalid = this.queryCtrl.invalid;
+      this.queryTextInvalid = !this.validateQuery(value);
     });
   }
 
@@ -206,7 +206,11 @@ export class AppComponent implements OnInit {
     if (keys.some(k => !['field', 'operator', 'value', 'entity'].includes(k))) {
       return false;
     }
-    if (!('field' in rule) || !('operator' in rule) || !('value' in rule)) {
+    if (!('field' in rule) || !('operator' in rule)) {
+      return false;
+    }
+    const requiresValue = rule.operator !== 'is null' && rule.operator !== 'is not null';
+    if (requiresValue && !('value' in rule)) {
       return false;
     }
 
@@ -220,47 +224,49 @@ export class AppComponent implements OnInit {
       return false;
     }
 
-    const val = rule.value;
-    switch (fieldConf.type) {
-      case 'string':
-      case 'textarea':
-        if (typeof val !== 'string') {
-          return false;
-        }
-        break;
-      case 'number':
-        if (typeof val !== 'number' || isNaN(val)) {
-          return false;
-        }
-        break;
-      case 'time':
-        if (typeof val !== 'string' || !/^\d{2}:\d{2}(:\d{2})?$/.test(val)) {
-          return false;
-        }
-        break;
-      case 'date':
-        if (!(val instanceof Date) && (typeof val !== 'string' || isNaN(Date.parse(val)))) {
-          return false;
-        }
-        break;
-      case 'category':
-        if (!fieldConf.options || !fieldConf.options.some(o => o.value === val)) {
-          return false;
-        }
-        break;
-      case 'boolean':
-        if (val !== true && val !== false) {
-          return false;
-        }
-        break;
-      case 'multiselect':
-        if (!Array.isArray(val)) {
-          return false;
-        }
-        if (fieldConf.options && val.some((v: any) => !fieldConf.options!.some(o => o.value === v))) {
-          return false;
-        }
-        break;
+    if (requiresValue) {
+      const val = rule.value;
+      switch (fieldConf.type) {
+        case 'string':
+        case 'textarea':
+          if (typeof val !== 'string') {
+            return false;
+          }
+          break;
+        case 'number':
+          if (typeof val !== 'number' || isNaN(val)) {
+            return false;
+          }
+          break;
+        case 'time':
+          if (typeof val !== 'string' || !/^\d{2}:\d{2}(:\d{2})?$/.test(val)) {
+            return false;
+          }
+          break;
+        case 'date':
+          if (!(val instanceof Date) && (typeof val !== 'string' || isNaN(Date.parse(val)))) {
+            return false;
+          }
+          break;
+        case 'category':
+          if (!fieldConf.options || !fieldConf.options.some(o => o.value === val)) {
+            return false;
+          }
+          break;
+        case 'boolean':
+          if (val !== true && val !== false) {
+            return false;
+          }
+          break;
+        case 'multiselect':
+          if (!Array.isArray(val)) {
+            return false;
+          }
+          if (fieldConf.options && val.some((v: any) => !fieldConf.options!.some(o => o.value === v))) {
+            return false;
+          }
+          break;
+      }
     }
 
     if ('entity' in rule && this.currentConfig.entities && !this.currentConfig.entities[rule.entity]) {
