@@ -250,10 +250,13 @@ export class AppComponent implements OnInit {
           break;
         case 'category':
           if (rule.operator === 'in' || rule.operator === 'not in') {
-            if (!Array.isArray(val)) {
+            if (!Array.isArray(val) || val.length === 0) {
               return false;
             }
-            if (fieldConf.options && val.some((v: any) => !fieldConf.options!.some(o => o.value === v))) {
+            if (
+              fieldConf.options &&
+              val.some((v: any) => !fieldConf.options!.some(o => o.value === v))
+            ) {
               return false;
             }
           } else {
