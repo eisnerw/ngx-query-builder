@@ -258,7 +258,7 @@ Can be used to customize the default empty warning message, alternatively can sp
 |`getDisabledState`|`() => boolean`| Retrieves or determines the disabled state of the component|
 
 ## Dependencies
-- Angular 18+
+- Angular 19+
 
 # Development
 
