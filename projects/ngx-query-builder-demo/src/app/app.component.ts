@@ -135,7 +135,7 @@ export class AppComponent implements OnInit {
     private formBuilder: FormBuilder
   ) {
     this.queryCtrl = this.formBuilder.control(this.query);
-    this.currentConfig = this.entityConfig;
+    this.currentConfig = this.config;
     this.queryText = JSON.stringify(this.queryCtrl.value, null, 2);
     this.queryTextInvalid = !this.validateQuery(this.queryCtrl.value);
   }
