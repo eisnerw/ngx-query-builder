@@ -204,6 +204,11 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         this.entities = [];
       }
       this.operatorsCache = {};
+
+      if (changes['config']) {
+        this.data = this.cleanData(this.data);
+        this.handleDataChange();
+      }
     } else {
       throw new Error(`Expected 'config' must be a valid object, got ${type} instead.`);
     }
