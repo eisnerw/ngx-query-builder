@@ -125,7 +125,8 @@ export class AppComponent {
 
   public currentConfig!: QueryBuilderConfig;
   public allowRuleset: boolean = true;
-  public allowCollapse!: boolean;
+  public allowCollapse: boolean = false;
+  public allowNot: boolean = false;
   public persistValueOnFieldChange: boolean = false;
 
   constructor(

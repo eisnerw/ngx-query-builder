@@ -45,6 +45,7 @@ import {
   Input,
   OnChanges,
   QueryList,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
   ElementRef
@@ -122,7 +123,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   @Input() disabled!: boolean;
   @Input() level = 0;
   @Input() data: RuleSet = { condition: 'and', rules: [] };
-  @Input() enableNot = false;
+  @Input() allowNot = false;
   @Input() allowRuleset = true;
   @Input() allowCollapse = false;
   @Input() emptyMessage = 'A ruleset cannot be empty. Please add a rule or remove it all together.';
@@ -182,7 +183,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   // ----------OnChanges Implementation----------
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
     const config = this.config;
     const type = typeof config;
     if (type === 'object') {
@@ -205,6 +206,12 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       this.operatorsCache = {};
     } else {
       throw new Error(`Expected 'config' must be a valid object, got ${type} instead.`);
+    }
+
+    // Handle allowNot changes
+    if (changes['allowNot']) {
+      this.updateNotProperty(this.data, this.allowNot);
+      this.handleDataChange();
     }
   }
 
@@ -233,7 +240,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   @Input()
   get value(): RuleSet {
-    return this.data;
+    return this.cleanData(this.data);
   }
   set value(value: RuleSet) {
     // When component is initialized without a formControl, null is passed to value
@@ -246,7 +253,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   }
 
   registerOnChange(fn: any): void {
-    this.onChangeCallback = () => fn(this.data);
+    this.onChangeCallback = () => fn(this.cleanData(this.data));
   }
 
   registerOnTouched(fn: any): void {
@@ -452,7 +459,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       this.config.addRuleSet(parent);
     } else {
       const rs: RuleSet = { condition: 'and', rules: [] };
-      if (this.enableNot) {
+      if (this.allowNot) {
         rs.not = false;
       }
       parent.rules = parent.rules.concat([rs]);
@@ -775,7 +782,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return {
       onChange: this.changeCondition.bind(this),
       onChangeNot: this.changeNot.bind(this),
-      enableNot: this.enableNot,
+      allowNot: this.allowNot,
       getDisabledState: this.getDisabledState,
       $implicit: this.data
     };
@@ -912,6 +919,51 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     if (this.parentTouchedCallback) {
       this.parentTouchedCallback();
     }
+  }
+
+  private updateNotProperty(ruleset: RuleSet, allowNot: boolean): void {
+    if (allowNot) {
+      // Add 'not' property if it doesn't exist
+      if (!ruleset.hasOwnProperty('not')) {
+        ruleset.not = false;
+      }
+    } else {
+      // Remove 'not' property if it exists
+      if (ruleset.hasOwnProperty('not')) {
+        delete ruleset.not;
+      }
+    }
+    
+    // Recursively update nested rulesets
+    if (ruleset.rules) {
+      ruleset.rules.forEach((rule: Rule | RuleSet) => {
+        if (this.isRuleset(rule)) {
+          this.updateNotProperty(rule, allowNot);
+        }
+      });
+    }
+  }
+
+  private cleanData(data: RuleSet): RuleSet {
+    // Create a deep copy to avoid modifying the original data
+    const cleanedData = JSON.parse(JSON.stringify(data));
+    
+    // Remove 'not' property if allowNot is false
+    if (!this.allowNot && cleanedData.hasOwnProperty('not')) {
+      delete cleanedData.not;
+    }
+    
+    // Recursively clean nested rulesets
+    if (cleanedData.rules) {
+      cleanedData.rules = cleanedData.rules.map((rule: Rule | RuleSet) => {
+        if (this.isRuleset(rule)) {
+          return this.cleanData(rule);
+        }
+        return rule;
+      });
+    }
+    
+    return cleanedData;
   }
 
 }

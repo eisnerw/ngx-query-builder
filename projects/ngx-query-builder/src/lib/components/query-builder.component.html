@@ -46,7 +46,7 @@
                                  [parentRuleRemoveButtonTemplate]="parentRuleRemoveButtonTemplate || ruleRemoveButtonTemplate"
                                  [parentEmptyWarningTemplate]="parentEmptyWarningTemplate || emptyWarningTemplate" [parentArrowIconTemplate]="parentArrowIconTemplate || arrowIconTemplate"
                                  [parentValue]="data" [classNames]="classNames" [config]="config" [allowRuleset]="allowRuleset"
-                                 [allowCollapse]="allowCollapse" [emptyMessage]="emptyMessage" [operatorMap]="operatorMap">
+                                 [allowCollapse]="allowCollapse" [allowNot]="allowNot" [emptyMessage]="emptyMessage" [operatorMap]="operatorMap">
               </ngx-query-builder>
             </li>
           </ng-container>
@@ -75,7 +75,7 @@
 
   <ng-template #defaultSwitchGroup>
     <div [ngClass]="getClassNames('switchGroup', 'transition')" *ngIf="data">
-      <div [ngClass]="getClassNames('switchControl')" *ngIf="enableNot">
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="allowNot">
         <input type="checkbox" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.not"
                (ngModelChange)="changeNot($event)" [disabled]="disabled" />
         <label (click)="changeNot(!data.not)" [ngClass]="getClassNames('switchLabel')">NOT</label>
