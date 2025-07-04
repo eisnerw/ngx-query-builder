@@ -249,8 +249,17 @@ export class AppComponent implements OnInit {
           }
           break;
         case 'category':
-          if (!fieldConf.options || !fieldConf.options.some(o => o.value === val)) {
-            return false;
+          if (rule.operator === 'in' || rule.operator === 'not in') {
+            if (!Array.isArray(val)) {
+              return false;
+            }
+            if (fieldConf.options && val.some((v: any) => !fieldConf.options!.some(o => o.value === v))) {
+              return false;
+            }
+          } else {
+            if (!fieldConf.options || !fieldConf.options.some(o => o.value === val)) {
+              return false;
+            }
           }
           break;
         case 'boolean':
