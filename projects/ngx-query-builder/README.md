@@ -126,7 +126,6 @@ config: QueryBuilderConfig = {
 |`config.calculateFieldChangeValue`| `(currentField: Field, nextField: Field, currentValue: any) => any`                                                                                                         |Optional|                                  | Used to calculate the new value when a rule's field changes. |
 |`value`| [`Ruleset`](/projects/ngx-query-builder/src/lib/models/query-builder.interfaces.ts)                                                                                         |Optional| { condition: 'and', rules: [] }  | Object that stores the state of the component. |
 
-When `config.entities` is not provided, any `entity` properties found in the query are removed from the emitted JSON. If `config.entities` is specified, rules without an `entity` automatically receive the entity from the first matching field.
 ## Structural Directives
 
 Use these directives to replace different parts of query builder with custom components.
