@@ -1,5 +1,5 @@
 import { FormBuilder, FormControl } from '@angular/forms';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { QueryBuilderClassNames, QueryBuilderConfig } from 'ngx-query-builder';
 
 @Component({
@@ -8,8 +8,9 @@ import { QueryBuilderClassNames, QueryBuilderConfig } from 'ngx-query-builder';
   styleUrls: ['./app.component.less'],
   standalone: false
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   public queryCtrl: FormControl;
+  public queryText: string = '';
 
   public bootstrapClassNames: QueryBuilderClassNames = {
     removeIcon: 'fa fa-minus',
@@ -134,6 +135,22 @@ export class AppComponent {
   ) {
     this.queryCtrl = this.formBuilder.control(this.query);
     this.currentConfig = this.entityConfig;
+    this.queryText = JSON.stringify(this.queryCtrl.value, null, 2);
+  }
+
+  ngOnInit(): void {
+    this.queryCtrl.valueChanges.subscribe(value => {
+      this.queryText = JSON.stringify(value, null, 2);
+    });
+  }
+
+  updateQuery(text: string): void {
+    try {
+      const val = JSON.parse(text);
+      this.queryCtrl.setValue(val);
+    } catch {
+      // ignore invalid JSON
+    }
   }
 
   switchModes(event: Event) {
