@@ -44,10 +44,12 @@ import {
   forwardRef,
   Input,
   OnChanges,
+  AfterViewInit,
   QueryList,
   SimpleChanges,
   TemplateRef,
   ViewChild,
+  ViewChildren,
   ElementRef
 } from '@angular/core';
 
@@ -70,7 +72,7 @@ export const VALIDATOR: any = {
   providers: [CONTROL_VALUE_ACCESSOR, VALIDATOR],
   standalone: false
 })
-export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, Validator {
+export class QueryBuilderComponent implements OnChanges, AfterViewInit, ControlValueAccessor, Validator {
   public fields!: Field[];
   public entities!: Entity[];
   public defaultClassNames: QueryBuilderClassNames = {
@@ -150,6 +152,8 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   @ViewChild('treeContainer', {static: true}) treeContainer!: ElementRef;
   public collapsed = false;
 
+  @ViewChildren(forwardRef(() => QueryBuilderComponent)) children!: QueryList<QueryBuilderComponent>;
+
   @ContentChild(QueryButtonGroupDirective) buttonGroupTemplate!: QueryButtonGroupDirective;
   @ContentChild(QuerySwitchGroupDirective) switchGroupTemplate!: QuerySwitchGroupDirective;
   @ContentChild(QueryFieldDirective) fieldTemplate!: QueryFieldDirective;
@@ -180,6 +184,22 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   private buttonGroupContext!: ButtonGroupContext;
 
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
+
+  ngAfterViewInit(): void {
+    this.updateChildCallbacks();
+    if (this.children) {
+      this.children.changes.subscribe(() => this.updateChildCallbacks());
+    }
+  }
+
+  private updateChildCallbacks(): void {
+    if (this.children) {
+      this.children.forEach((child) => {
+        child.parentChangeCallback = this.onChangeCallback;
+        child.parentTouchedCallback = this.onTouchedCallback;
+      });
+    }
+  }
 
   // ----------OnChanges Implementation----------
 
@@ -259,10 +279,12 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   registerOnChange(fn: any): void {
     this.onChangeCallback = () => fn(this.cleanData(this.data));
+    this.updateChildCallbacks();
   }
 
   registerOnTouched(fn: any): void {
     this.onTouchedCallback = () => fn(this.data);
+    this.updateChildCallbacks();
   }
 
   setDisabledState(isDisabled: boolean): void {
