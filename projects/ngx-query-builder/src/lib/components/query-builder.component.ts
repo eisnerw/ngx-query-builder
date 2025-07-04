@@ -122,6 +122,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   @Input() disabled!: boolean;
   @Input() level = 0;
   @Input() data: RuleSet = { condition: 'and', rules: [] };
+  @Input() enableNot = false;
   @Input() allowRuleset = true;
   @Input() allowCollapse = false;
   @Input() emptyMessage = 'A ruleset cannot be empty. Please add a rule or remove it all together.';
@@ -450,7 +451,11 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     if (this.config.addRuleSet) {
       this.config.addRuleSet(parent);
     } else {
-      parent.rules = parent.rules.concat([{ condition: 'and', rules: [] }]);
+      const rs: RuleSet = { condition: 'and', rules: [] };
+      if (this.enableNot) {
+        rs.not = false;
+      }
+      parent.rules = parent.rules.concat([rs]);
     }
 
     this.handleTouched();
@@ -500,6 +505,16 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
 
     this.data.condition = value;
+    this.handleTouched();
+    this.handleDataChange();
+  }
+
+  changeNot(value: boolean): void {
+    if (this.disabled) {
+      return;
+    }
+
+    this.data.not = value;
     this.handleTouched();
     this.handleDataChange();
   }
@@ -759,6 +774,8 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   getSwitchGroupContext(): SwitchGroupContext {
     return {
       onChange: this.changeCondition.bind(this),
+      onChangeNot: this.changeNot.bind(this),
+      enableNot: this.enableNot,
       getDisabledState: this.getDisabledState,
       $implicit: this.data
     };

@@ -75,6 +75,11 @@
 
   <ng-template #defaultSwitchGroup>
     <div [ngClass]="getClassNames('switchGroup', 'transition')" *ngIf="data">
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="enableNot">
+        <input type="checkbox" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.not"
+               (ngModelChange)="changeNot($event)" [disabled]="disabled" />
+        <label (click)="changeNot(!data.not)" [ngClass]="getClassNames('switchLabel')">NOT</label>
+      </div>
       <div [ngClass]="getClassNames('switchControl')">
         <input type="radio" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.condition" [disabled]=disabled
                value="and" #andOption />

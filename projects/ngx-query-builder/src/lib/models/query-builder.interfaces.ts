@@ -1,6 +1,7 @@
 export interface RuleSet {
   condition: string;
   rules: (RuleSet | Rule)[];
+  not?: boolean;
   collapsed?: boolean;
   isChild?: boolean;
 }
@@ -103,6 +104,8 @@ export interface QueryBuilderConfig {
 
 export interface SwitchGroupContext {
   onChange: (conditionValue: string) => void;
+  onChangeNot: (not: boolean) => void;
+  enableNot: boolean;
   getDisabledState: () => boolean;
   $implicit: RuleSet;
 }
