@@ -30,8 +30,8 @@
                   </div>
 
                   <div [ngClass]="getClassNames('ruleActions')">
-                    <button type="button" (click)="convertToRuleset(rule, data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
-                      <i [ngClass]="getClassNames('addIcon')"></i> Convert to Ruleset
+                    <button *ngIf="allowConvertToRuleset" type="button" (click)="convertToRuleset(rule, data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
+                      Convert to Ruleset
                     </button>
                     <ng-template [ngTemplateOutlet]="_ruleRemoveButtonTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
                   </div>
@@ -49,7 +49,8 @@
                                  [parentRuleRemoveButtonTemplate]="parentRuleRemoveButtonTemplate || ruleRemoveButtonTemplate"
                                  [parentEmptyWarningTemplate]="parentEmptyWarningTemplate || emptyWarningTemplate" [parentArrowIconTemplate]="parentArrowIconTemplate || arrowIconTemplate"
                                  [parentValue]="data" [classNames]="classNames" [config]="config" [allowRuleset]="allowRuleset"
-                                 [allowCollapse]="allowCollapse" [allowNot]="allowNot" [emptyMessage]="emptyMessage" [operatorMap]="operatorMap">
+                                 [allowCollapse]="allowCollapse" [allowNot]="allowNot" [allowConvertToRuleset]="allowConvertToRuleset"
+                                 [emptyMessage]="emptyMessage" [operatorMap]="operatorMap">
               </ngx-query-builder>
             </li>
           </ng-container>
