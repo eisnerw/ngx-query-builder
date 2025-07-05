@@ -30,6 +30,9 @@
                   </div>
 
                   <div [ngClass]="getClassNames('ruleActions')">
+                    <button type="button" (click)="convertToRuleset(rule, data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
+                      <i [ngClass]="getClassNames('addIcon')"></i> Convert to Ruleset
+                    </button>
                     <ng-template [ngTemplateOutlet]="_ruleRemoveButtonTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
                   </div>
                 </div>
