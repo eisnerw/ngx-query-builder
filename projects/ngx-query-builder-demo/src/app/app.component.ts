@@ -11,7 +11,8 @@ import { QueryBuilderClassNames, QueryBuilderConfig } from 'ngx-query-builder';
 export class AppComponent implements OnInit {
   public queryCtrl: FormControl;
   public queryText: string = '';
-  public queryTextInvalid = false;
+  public queryTextState: 'valid' | 'invalid-json' | 'invalid-query' = 'valid';
+  public queryTitle = '';
 
   public bootstrapClassNames: QueryBuilderClassNames = {
     removeIcon: 'fa fa-minus',
@@ -137,13 +138,25 @@ export class AppComponent implements OnInit {
     this.queryCtrl = this.formBuilder.control(this.query);
     this.currentConfig = this.config;
     this.queryText = JSON.stringify(this.queryCtrl.value, null, 2);
-    this.queryTextInvalid = !this.validateQuery(this.queryCtrl.value);
+    if (this.validateQuery(this.queryCtrl.value)) {
+      this.queryTextState = 'valid';
+      this.queryTitle = '';
+    } else {
+      this.queryTextState = 'invalid-query';
+      this.queryTitle = 'Invalid query';
+    }
   }
 
   ngOnInit(): void {
     this.queryCtrl.valueChanges.subscribe(value => {
       this.queryText = JSON.stringify(value, null, 2);
-      this.queryTextInvalid = !this.validateQuery(value);
+      if (this.validateQuery(value)) {
+        this.queryTextState = 'valid';
+        this.queryTitle = '';
+      } else {
+        this.queryTextState = 'invalid-query';
+        this.queryTitle = 'Invalid query';
+      }
     });
   }
 
@@ -152,12 +165,15 @@ export class AppComponent implements OnInit {
       const val = JSON.parse(text.trim());
       if (this.validateQuery(val)) {
         this.queryCtrl.setValue(val);
-        this.queryTextInvalid = false;
+        this.queryTextState = 'valid';
+        this.queryTitle = '';
       } else {
-        this.queryTextInvalid = true;
+        this.queryTextState = 'invalid-query';
+        this.queryTitle = 'Invalid query';
       }
     } catch {
-      this.queryTextInvalid = true;
+      this.queryTextState = 'invalid-json';
+      this.queryTitle = 'Invalid JSON';
       // ignore invalid JSON
     }
   }
