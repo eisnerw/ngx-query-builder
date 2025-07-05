@@ -208,6 +208,19 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       throw new Error(`Expected 'config' must be a valid object, got ${type} instead.`);
     }
 
+    if (changes['config']) {
+      const prev: QueryBuilderConfig | undefined = changes['config'].previousValue;
+      const prevHasEntities = prev && prev.entities;
+      const currHasEntities = this.config.entities;
+      if (prevHasEntities && !currHasEntities) {
+        this.removeEntitiesFromRuleset(this.data);
+        this.handleDataChange();
+      } else if (!prevHasEntities && currHasEntities) {
+        this.addEntitiesToRuleset(this.data);
+        this.handleDataChange();
+      }
+    }
+
     // Handle allowNot changes
     if (changes['allowNot']) {
       this.updateNotProperty(this.data, this.allowNot);
@@ -944,6 +957,42 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
   }
 
+  private addEntitiesToRuleset(ruleset: RuleSet): void {
+    if (!ruleset.rules) { return; }
+    ruleset.rules.forEach((rule: Rule | RuleSet) => {
+      if (this.isRuleset(rule)) {
+        this.addEntitiesToRuleset(rule);
+      } else {
+        if (!('entity' in rule) || !rule.entity) {
+          const fieldConf = this.config.fields[rule.field];
+          let entity = fieldConf && fieldConf.entity;
+          if (!entity) {
+            const matched = Object.values(this.config.fields).find(f => (f as Field).name === rule.field && (f as Field).entity);
+            if (matched) {
+              entity = (matched as Field).entity;
+            }
+          }
+          if (entity) {
+            rule.entity = entity;
+          }
+        }
+      }
+    });
+  }
+
+  private removeEntitiesFromRuleset(ruleset: RuleSet): void {
+    if (!ruleset.rules) { return; }
+    ruleset.rules.forEach((rule: Rule | RuleSet) => {
+      if (this.isRuleset(rule)) {
+        this.removeEntitiesFromRuleset(rule);
+      } else {
+        if (rule.hasOwnProperty('entity')) {
+          delete (rule as Rule).entity;
+        }
+      }
+    });
+  }
+
   private cleanData(data: RuleSet): RuleSet {
     // Create a deep copy to avoid modifying the original data
     const cleanedData = JSON.parse(JSON.stringify(data));
@@ -958,8 +1007,28 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       cleanedData.rules = cleanedData.rules.map((rule: Rule | RuleSet) => {
         if (this.isRuleset(rule)) {
           return this.cleanData(rule);
+        } else {
+          if (this.config.entities) {
+            if (!('entity' in rule) || !rule.entity) {
+              const fieldConf = this.config.fields[rule.field];
+              let entity = fieldConf && fieldConf.entity;
+              if (!entity) {
+                const matched = Object.values(this.config.fields).find(f => (f as Field).name === rule.field && (f as Field).entity);
+                if (matched) {
+                  entity = (matched as Field).entity;
+                }
+              }
+              if (entity) {
+                (rule as Rule).entity = entity;
+              }
+            }
+          } else {
+            if (rule.hasOwnProperty('entity')) {
+              delete (rule as Rule).entity;
+            }
+          }
+          return rule;
         }
-        return rule;
       });
     }
     

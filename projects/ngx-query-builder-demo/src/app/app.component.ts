@@ -43,15 +43,15 @@ export class AppComponent implements OnInit {
   public query = {
     condition: 'and',
     rules: [
-      {field: 'age', operator: '<=', entity: 'physical'},
-      {field: 'birthday', operator: '=', value: new Date(), entity: 'nonphysical'},
+      {field: 'age', operator: '<='},
+      {field: 'birthday', operator: '=', value: new Date()},
       {
         condition: 'or',
         rules: [
-          {field: 'gender', operator: '=', entity: 'physical'},
-          {field: 'occupation', operator: 'in', entity: 'nonphysical'},
-          {field: 'school', operator: 'is null', entity: 'nonphysical'},
-          {field: 'notes', operator: '=', entity: 'nonphysical'}
+          {field: 'gender', operator: '='},
+          {field: 'occupation', operator: 'in'},
+          {field: 'school', operator: 'is null'},
+          {field: 'notes', operator: '='}
         ]
       }
     ]
@@ -135,7 +135,7 @@ export class AppComponent implements OnInit {
     private formBuilder: FormBuilder
   ) {
     this.queryCtrl = this.formBuilder.control(this.query);
-    this.currentConfig = this.entityConfig;
+    this.currentConfig = this.config;
     this.queryText = JSON.stringify(this.queryCtrl.value, null, 2);
     this.queryTextInvalid = !this.validateQuery(this.queryCtrl.value);
   }
