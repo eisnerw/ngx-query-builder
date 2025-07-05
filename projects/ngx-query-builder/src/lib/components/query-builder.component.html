@@ -135,13 +135,13 @@
           <i [ngClass]="getClassNames('downIcon')"></i>
         </button>
       </ng-container>
-      <ng-container *ngIf="!!parentValue && allowRuleset">
-        <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
-      </ng-container>
       <button *ngIf="allowConvertToRuleset && parentValue && data.rules.length === 1" type="button"
               (click)="convertRulesetToRule(data, parentValue)" [ngClass]="getClassNames('button')" [disabled]="disabled">
         Convert to Rule
       </button>
+      <ng-container *ngIf="!!parentValue && allowRuleset">
+        <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
+      </ng-container>
     </div>
   </ng-template>
 </ng-template>
