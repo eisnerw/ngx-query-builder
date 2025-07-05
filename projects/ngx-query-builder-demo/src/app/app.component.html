@@ -24,6 +24,9 @@
           <label><input type="checkbox" [(ngModel)]='allowCollapse'>Allow Collapse</label>
         </div>
         <div>
+          <label><input type="checkbox" [(ngModel)]='useCollapsedSummary' (change)='updateCollapsedSummary()'>Collapsed Summary</label>
+        </div>
+        <div>
           <label><input type="checkbox" [(ngModel)]='allowNot'>Allow Not</label>
         </div>
         <div>

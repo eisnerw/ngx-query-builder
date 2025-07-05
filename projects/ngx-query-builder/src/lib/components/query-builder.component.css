@@ -254,4 +254,9 @@
     display: inline-block;
     vertical-align: top;
   }
+
+  .q-collapsed-summary {
+    margin-left: 8px;
+    font-style: italic;
+  }
 }

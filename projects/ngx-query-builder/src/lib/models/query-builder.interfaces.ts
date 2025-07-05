@@ -83,6 +83,7 @@ export interface QueryBuilderClassNames {
   inputControlSize?: string;
   upIcon?: string;
   downIcon?: string;
+  collapsedSummary?: string;
 }
 
 export interface QueryBuilderConfig {
@@ -102,6 +103,7 @@ export interface QueryBuilderConfig {
   calculateFieldChangeValue?: (currentField: Field | undefined,
                                nextField: Field | undefined,
                                currentValue: any) => any;
+  customCollapsedSummary?: (ruleset: RuleSet) => string;
 }
 
 export interface SwitchGroupContext {

@@ -107,7 +107,8 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     inputControl: 'q-input-control',
     inputControlSize: 'q-control-size',
     upIcon: 'q-icon q-up-icon',
-    downIcon: 'q-icon q-down-icon'
+    downIcon: 'q-icon q-down-icon',
+    collapsedSummary: 'q-collapsed-summary'
   };
   public defaultOperatorMap: Record<string, string[]> = {
     string: ['=', '!=', 'contains', 'like'],
