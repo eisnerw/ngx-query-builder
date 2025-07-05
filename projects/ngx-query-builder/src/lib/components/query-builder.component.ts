@@ -179,6 +179,18 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   private ruleRemoveButtonContextCache = new Map<Rule, RuleRemoveButtonContext>();
   private buttonGroupContext!: ButtonGroupContext;
 
+  private clearContextCaches(): void {
+    this.inputContextCache.clear();
+    this.operatorContextCache.clear();
+    this.fieldContextCache.clear();
+    this.entityContextCache.clear();
+    this.rulesetAddRuleButtonContextCache.clear();
+    this.rulesetAddRulesetButtonContextCache.clear();
+    this.rulesetRemoveButtonContextCache.clear();
+    this.ruleRemoveButtonContextCache.clear();
+    this.buttonGroupContext = undefined as any;
+  }
+
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   // ----------OnChanges Implementation----------
@@ -208,9 +220,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       throw new Error(`Expected 'config' must be a valid object, got ${type} instead.`);
     }
 
-    // Handle allowNot changes
-    if (changes['allowNot']) {
+    // Handle allowNot or data changes
+    if (changes['allowNot'] || changes['data']) {
       this.updateNotProperty(this.data, this.allowNot);
+      this.clearContextCaches();
       this.handleDataChange();
     }
   }

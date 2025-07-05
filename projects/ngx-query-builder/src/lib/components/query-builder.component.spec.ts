@@ -24,4 +24,13 @@ describe('QueryBuilderComponent', () => {
   it('should be created', () => {
     expect(component).toBeTruthy();
   });
+
+  it('updates when input data changes', () => {
+    const initial = { condition: 'and', rules: [{ field: 'age', operator: '=' }] } as any;
+    component.value = initial;
+    const updated = { condition: 'and', rules: [] } as any;
+    component.data = updated;
+    component.ngOnChanges({ data: { previousValue: initial, currentValue: updated, firstChange: false, isFirstChange: () => false } } as any);
+    expect(component.value.rules.length).toBe(0);
+  });
 });
