@@ -33,9 +33,6 @@
                     <button *ngIf="allowConvertToRuleset" type="button" (click)="convertToRuleset(rule, data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
                       Convert to Ruleset
                     </button>
-                    <button *ngIf="allowConvertToRuleset && parentValue && data.rules.length === 1" type="button" (click)="convertRulesetToRule(rule, data, parentValue)" [ngClass]="getClassNames('button')" [disabled]="disabled">
-                      Convert Ruleset to Rule
-                    </button>
                     <ng-template [ngTemplateOutlet]="_ruleRemoveButtonTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
                   </div>
                 </div>
@@ -120,6 +117,10 @@
       <ng-container *ngIf="!!parentValue && allowRuleset">
         <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
       </ng-container>
+      <button *ngIf="allowConvertToRuleset && parentValue && data.rules.length === 1" type="button"
+              (click)="convertRulesetToRule(data, parentValue)" [ngClass]="getClassNames('button')" [disabled]="disabled">
+        Convert Ruleset to Rule
+      </button>
     </div>
   </ng-template>
 </ng-template>
