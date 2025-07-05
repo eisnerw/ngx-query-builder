@@ -60,6 +60,7 @@
   .q-button {
     padding: 0 8px;
     background-color: white;
+    white-space: nowrap;
 
     &:disabled {
       display: none;
@@ -162,6 +163,9 @@
 
     .q-rule-actions {
       flex-shrink: 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
   }
 
