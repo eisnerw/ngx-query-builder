@@ -126,8 +126,7 @@ config: QueryBuilderConfig = {
 |`operatorMap`| `{ [key: string]: string[] }`                                                                                                                                               |Optional|                                  | Used to map field types to list of operators. |
 |`persistValueOnFieldChange`| `boolean`                                                                                                                                                                   |Optional| `false`                          | If `true`, when a field changes to another of the same type, and the type is one of: string, number, time, date, or boolean, persist the previous value. This option is ignored if config.calculateFieldChangeValue is provided. |
 |`config.calculateFieldChangeValue`| `(currentField: Field, nextField: Field, currentValue: any) => any`                                                                                                         |Optional|                                  | Used to calculate the new value when a rule's field changes. |
-|`config.customCollapsedSummary`| `(ruleset: RuleSet) => string`
-                                                |Optional|             | Generates a custom summary string when a ruleset is collapsed. |
+|`config.customCollapsedSummary`| `(ruleset: RuleSet) => string` |Optional| | Generates a custom summary string when a ruleset is collapsed. |
 |`value`| [`Ruleset`](/projects/ngx-query-builder/src/lib/models/query-builder.interfaces.ts)                                                                                         |Optional| { condition: 'and', rules: [] }  | Object that stores the state of the component. |
 
 ## Structural Directives
