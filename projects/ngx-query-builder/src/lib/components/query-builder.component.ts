@@ -492,6 +492,28 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     this.handleDataChange();
   }
 
+  convertRulesetToRule(rule: Rule, parent?: RuleSet, grandParent?: RuleSet): void {
+    if (this.disabled) {
+      return;
+    }
+
+    parent = parent || this.data;
+    grandParent = grandParent || this.parentValue;
+    if (!grandParent) {
+      return;
+    }
+
+    const index = grandParent.rules.indexOf(parent);
+    if (index === -1) {
+      return;
+    }
+
+    grandParent.rules.splice(index, 1, rule);
+
+    this.handleTouched();
+    this.handleDataChange();
+  }
+
   addRuleSet(parent?: RuleSet): void {
     if (this.disabled) {
       return;

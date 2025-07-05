@@ -33,6 +33,9 @@
                     <button *ngIf="allowConvertToRuleset" type="button" (click)="convertToRuleset(rule, data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
                       Convert to Ruleset
                     </button>
+                    <button *ngIf="allowConvertToRuleset && parentValue && data.rules.length === 1" type="button" (click)="convertRulesetToRule(rule, data, parentValue)" [ngClass]="getClassNames('button')" [disabled]="disabled">
+                      Convert Ruleset to Rule
+                    </button>
                     <ng-template [ngTemplateOutlet]="_ruleRemoveButtonTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
                   </div>
                 </div>
