@@ -130,7 +130,6 @@ export class AppComponent implements OnInit {
   public allowRuleset: boolean = true;
   public allowCollapse: boolean = true;
   public allowNot: boolean = false;
-  public allowConvertToRuleset: boolean = false;
   public persistValueOnFieldChange: boolean = false;
 
   constructor(

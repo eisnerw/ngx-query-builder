@@ -125,7 +125,6 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   @Input() data: RuleSet = { condition: 'and', rules: [] };
   @Input() allowNot = false;
   @Input() allowRuleset = true;
-  @Input() allowConvertToRuleset = false;
   @Input() allowCollapse = true;
   @Input() emptyMessage = 'A ruleset cannot be empty. Please add a rule or remove it all together.';
   @Input() classNames!: QueryBuilderClassNames;
@@ -463,34 +462,6 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     this.handleDataChange();
   }
 
-  convertToRuleset(rule: Rule, parent?: RuleSet): void {
-    if (this.disabled) {
-      return;
-    }
-
-    parent = parent || this.data;
-    const index = parent.rules.indexOf(rule);
-    if (index === -1) {
-      return;
-    }
-
-    const newRule: Rule = { ...rule };
-    const rs: RuleSet = { condition: 'or', rules: [newRule] };
-    if (this.allowNot) {
-      rs.not = false;
-    }
-
-    parent.rules.splice(index, 1, rs);
-
-    this.inputContextCache.delete(rule);
-    this.operatorContextCache.delete(rule);
-    this.fieldContextCache.delete(rule);
-    this.entityContextCache.delete(rule);
-    this.ruleRemoveButtonContextCache.delete(rule);
-
-    this.handleTouched();
-    this.handleDataChange();
-  }
 
   addRuleSet(parent?: RuleSet): void {
     if (this.disabled) {

@@ -115,7 +115,6 @@ config: QueryBuilderConfig = {
 |:--- |:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--- |:---------------------------------|:--- |
 |`allowRuleset`| `boolean`                                                                                                                                                                   |Optional| `true`                           | Displays the `+ Ruleset` button if `true`. |
 |`allowCollapse`| `boolean` |Optional| `true`                          | Enables collapsible rule sets if `true`.  |
-|`allowConvertToRuleset`| `boolean` |Optional| `false`                          | Displays the `Convert to Ruleset` button if `true`. |
 |`allowNot`| `boolean` |Optional| `false`                          | Adds a `NOT` button and sets a `not` attribute on the ruleset JSON. |
 |`classNames`| [`QueryBuilderClassNames`](/projects/ngx-query-builder/src/lib/models/query-builder.interfaces.ts#L48)                                                                      |Optional|                                  | CSS class names for different child elements in `query-builder` component. |
 |`config`| [`QueryBuilderConfig`](/projects/ngx-query-builder/src/lib/models/query-builder.interfaces.ts#L85)                                                                          |Required|                                  | Configuration object for the main component. |
