@@ -131,6 +131,8 @@ export class AppComponent implements OnInit {
   public allowNot: boolean = false;
   public persistValueOnFieldChange: boolean = false;
 
+  private updatingFromTree = false;
+
   constructor(
     private formBuilder: FormBuilder
   ) {
@@ -142,16 +144,23 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.queryCtrl.valueChanges.subscribe(value => {
+      this.updatingFromTree = true;
       this.queryText = JSON.stringify(value, null, 2);
       this.queryTextInvalid = !this.validateQuery(value);
+      this.updatingFromTree = false;
     });
   }
 
   updateQuery(text: string): void {
+    if (this.updatingFromTree) {
+      return;
+    }
     try {
       const val = JSON.parse(text.trim());
       if (this.validateQuery(val)) {
+        this.updatingFromTree = true;
         this.queryCtrl.setValue(val);
+        this.updatingFromTree = false;
         this.queryTextInvalid = false;
       } else {
         this.queryTextInvalid = true;
