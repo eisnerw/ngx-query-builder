@@ -105,6 +105,9 @@
                value="or" #orOption />
         <label (click)="changeCondition(orOption.value)" [ngClass]="getClassNames('switchLabel')">OR</label>
       </div>
+      <span *ngIf="collapsed && config.customCollapsedSummary" [ngClass]="getClassNames('collapsedSummary')">
+        {{ config.customCollapsedSummary(data) }}
+      </span>
     </div>
   </ng-template>
 </ng-template>

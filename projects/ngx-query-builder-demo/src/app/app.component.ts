@@ -1,6 +1,6 @@
 import { FormBuilder, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { QueryBuilderClassNames, QueryBuilderConfig } from 'ngx-query-builder';
+import { QueryBuilderClassNames, QueryBuilderConfig, RuleSet, Rule } from 'ngx-query-builder';
 
 @Component({
   selector: 'app-root',
@@ -133,12 +133,37 @@ export class AppComponent implements OnInit {
   public allowConvertToRuleset: boolean = false;
   public allowRuleUpDown: boolean = false;
   public persistValueOnFieldChange: boolean = false;
+  public useCollapsedSummary: boolean = false;
+
+  public collapsedSummary(ruleset: RuleSet): string {
+    const names = new Set<string>();
+    const walk = (rs: RuleSet) => {
+      rs.rules.forEach(r => {
+        if ((r as Rule).field) {
+          const field = this.currentConfig.fields[(r as Rule).field];
+          names.add(field?.name || (r as Rule).field);
+        } else if ((r as RuleSet).rules) {
+          walk(r as RuleSet);
+        }
+      });
+    };
+    walk(ruleset);
+    return Array.from(names).join(', ');
+  }
+
+  updateCollapsedSummary() {
+    this.currentConfig = {
+      ...this.currentConfig,
+      customCollapsedSummary: this.useCollapsedSummary ? this.collapsedSummary.bind(this) : undefined
+    } as QueryBuilderConfig;
+  }
 
   constructor(
     private formBuilder: FormBuilder
   ) {
     this.queryCtrl = this.formBuilder.control(this.query);
     this.currentConfig = this.config;
+    this.updateCollapsedSummary();
     this.queryText = JSON.stringify(this.queryCtrl.value, null, 2);
     if (this.validateQuery(this.queryCtrl.value)) {
       this.queryTextState = 'valid';
@@ -346,6 +371,7 @@ export class AppComponent implements OnInit {
 
   switchModes(event: Event) {
     this.currentConfig = (<HTMLInputElement>event.target).checked ? this.entityConfig : this.config;
+    this.updateCollapsedSummary();
   }
 
   changeDisabled(event: Event) {
@@ -354,9 +380,11 @@ export class AppComponent implements OnInit {
 
   changeRulesLimit(event: Event) {
     this.currentConfig = {...this.currentConfig, rulesLimit: parseInt((<HTMLInputElement>event.target).value, 10)} as QueryBuilderConfig;
+    this.updateCollapsedSummary();
   }
 
   changeLevelLimit(event: Event) {
     this.currentConfig = {...this.currentConfig, levelLimit: parseInt((<HTMLInputElement>event.target).value, 10)} as QueryBuilderConfig;
+    this.updateCollapsedSummary();
   }
 }
