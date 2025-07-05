@@ -125,6 +125,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   @Input() data: RuleSet = { condition: 'and', rules: [] };
   @Input() allowNot = false;
   @Input() allowRuleset = true;
+  @Input() allowConvertToRuleset = true;
   @Input() allowCollapse = false;
   @Input() emptyMessage = 'A ruleset cannot be empty. Please add a rule or remove it all together.';
   @Input() classNames!: QueryBuilderClassNames;
@@ -937,6 +938,12 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
             const error = field.validator(item as Rule, ruleset);
             if (error != null) {
               errorStore.push(error);
+            }
+          } else if (field && field.type === 'textarea') {
+            const rule = item as Rule;
+            const requiresValue = rule.operator !== 'is null' && rule.operator !== 'is not null';
+            if (requiresValue && (typeof rule.value !== 'string' || rule.value.trim() === '')) {
+              errorStore.push({ field: rule.field, error: 'required' });
             }
           }
         }
