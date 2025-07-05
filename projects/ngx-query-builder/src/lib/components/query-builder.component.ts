@@ -204,11 +204,6 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         this.entities = [];
       }
       this.operatorsCache = {};
-
-      if (changes['config']) {
-        this.data = this.cleanData(this.data);
-        this.handleDataChange();
-      }
     } else {
       throw new Error(`Expected 'config' must be a valid object, got ${type} instead.`);
     }
@@ -952,8 +947,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   private cleanData(data: RuleSet): RuleSet {
     // Create a deep copy to avoid modifying the original data
     const cleanedData = JSON.parse(JSON.stringify(data));
-    const entityMode = this.entities && this.entities.length > 0;
-
+    
     // Remove 'not' property if allowNot is false
     if (!this.allowNot && cleanedData.hasOwnProperty('not')) {
       delete cleanedData.not;
@@ -961,23 +955,14 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     
     // Recursively clean nested rulesets
     if (cleanedData.rules) {
-      cleanedData.rules = cleanedData.rules.map((item: Rule | RuleSet) => {
-        if (this.isRuleset(item)) {
-          return this.cleanData(item);
-        }
-        const rule = item as Rule;
-        if (!entityMode && rule.hasOwnProperty('entity')) {
-          delete (rule as any).entity;
-        } else if (entityMode && !rule.entity) {
-          const field = this.fields.find((f) => f.value === rule.field);
-          if (field && field.entity) {
-            rule.entity = field.entity;
-          }
+      cleanedData.rules = cleanedData.rules.map((rule: Rule | RuleSet) => {
+        if (this.isRuleset(rule)) {
+          return this.cleanData(rule);
         }
         return rule;
       });
     }
-
+    
     return cleanedData;
   }
 
