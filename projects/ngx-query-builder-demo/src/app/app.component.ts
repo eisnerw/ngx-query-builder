@@ -128,9 +128,9 @@ export class AppComponent implements OnInit {
 
   public currentConfig!: QueryBuilderConfig;
   public allowRuleset: boolean = true;
-  public allowCollapse: boolean = false;
+  public allowCollapse: boolean = true;
   public allowNot: boolean = false;
-  public allowConvertToRuleset: boolean = true;
+  public allowConvertToRuleset: boolean = false;
   public persistValueOnFieldChange: boolean = false;
 
   constructor(
