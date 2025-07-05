@@ -4,7 +4,18 @@
 [![npm downloads a week](https://img.shields.io/npm/dt/@kerwin612%2Fngx-query-builder.svg)](https://img.shields.io/npm/dt/@kerwin612%2Fngx-query-builder.svg)
 [![Contribute with Gitpod](https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod&color=green)](https://gitpod.io/#https://github.com/kerwin612/ngx-query-builder)
 
-A modernized Angular 4+ query builder based on jQuery QueryBuilder. Support for heavy customization with Angular components and provides a flexible way to handle custom data types.  
+A modernized Angular 4+ query builder based on jQuery QueryBuilder. Support for heavy customization with Angular components and provides a flexible way to handle custom data types.
+
+## Changes from kerwin612/ngx-query-builder
+
+- Upgraded Angular from version 18 to **19.2.14**.
+- Added optional **NOT** support for rulesets via the `allowNot` input.
+- Demo layout was revamped and now features a two-way bound JSON editor.
+- Editing the JSON textbox updates the query tree and vice versa.
+- The JSON editor validates input with lighter red for query errors and darker red for JSON errors.
+- Optional buttons allow converting a rule to a ruleset and back with `allowConvertToRuleset`.
+- Optional up/down arrows enable reordering rules when `allowRuleUpDown` is set.
+- Added a `customCollapsedSummary` callback to display summaries for collapsed rulesets.
 
 ***Forked from (https://github.com/zebzhao/Angular-QueryBuilder) as the original project has stopped updating and does not support the latest Angular versions, so I will continue to maintain it and support the latest versions of Angular.***
 
