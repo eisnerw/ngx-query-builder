@@ -81,6 +81,8 @@ export interface QueryBuilderClassNames {
   operatorControlSize?: string;
   inputControl?: string;
   inputControlSize?: string;
+  upIcon?: string;
+  downIcon?: string;
 }
 
 export interface QueryBuilderConfig {

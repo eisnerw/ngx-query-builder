@@ -30,6 +30,16 @@
                   </div>
 
                   <div [ngClass]="getClassNames('ruleActions')">
+                    <button *ngIf="allowRuleUpDown && data.rules.length > 1" type="button" (click)="moveRuleUp(rule, data)"
+                            [ngClass]="getClassNames('button')"
+                            [disabled]="disabled || i === 0">
+                      <i [ngClass]="getClassNames('upIcon')"></i>
+                    </button>
+                    <button *ngIf="allowRuleUpDown && data.rules.length > 1" type="button" (click)="moveRuleDown(rule, data)"
+                            [ngClass]="getClassNames('button')"
+                            [disabled]="disabled || i === data.rules.length - 1">
+                      <i [ngClass]="getClassNames('downIcon')"></i>
+                    </button>
                     <button *ngIf="allowConvertToRuleset" type="button" (click)="convertToRuleset(rule, data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
                       Convert to Ruleset
                     </button>
@@ -50,6 +60,7 @@
                                  [parentEmptyWarningTemplate]="parentEmptyWarningTemplate || emptyWarningTemplate" [parentArrowIconTemplate]="parentArrowIconTemplate || arrowIconTemplate"
                                  [parentValue]="data" [classNames]="classNames" [config]="config" [allowRuleset]="allowRuleset"
                                  [allowCollapse]="allowCollapse" [allowNot]="allowNot" [allowConvertToRuleset]="allowConvertToRuleset"
+                                 [allowRuleUpDown]="allowRuleUpDown"
                                  [emptyMessage]="emptyMessage" [operatorMap]="operatorMap">
               </ngx-query-builder>
             </li>
