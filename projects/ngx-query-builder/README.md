@@ -84,8 +84,8 @@ export class AppComponent {
 ##### `app.component.html`
 ```html
 <ngx-query-builder [(ngModel)]='query' [config]='config'>
-  <ng-container *queryInput="let rule; type: 'date'">
-    <custom-datepicker [(ngModel)]="rule.value"></custom-datepicker>
+  <ng-container *queryInput="let rule; type: 'date'; let onChange=onChange">
+    <custom-datepicker [(ngModel)]="rule.value" (ngModelChange)="onChange()"></custom-datepicker>
   </ng-container>
 </ngx-query-builder>
 ```
