@@ -131,6 +131,7 @@ export class AppComponent implements OnInit {
   public allowCollapse: boolean = true;
   public allowNot: boolean = false;
   public allowConvertToRuleset: boolean = false;
+  public allowRuleUpDown: boolean = false;
   public persistValueOnFieldChange: boolean = false;
 
   constructor(

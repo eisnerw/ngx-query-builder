@@ -105,7 +105,9 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     operatorControl: 'q-operator-control',
     operatorControlSize: 'q-control-size',
     inputControl: 'q-input-control',
-    inputControlSize: 'q-control-size'
+    inputControlSize: 'q-control-size',
+    upIcon: 'q-icon q-up-icon',
+    downIcon: 'q-icon q-down-icon'
   };
   public defaultOperatorMap: Record<string, string[]> = {
     string: ['=', '!=', 'contains', 'like'],
@@ -127,6 +129,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   @Input() allowRuleset = true;
   @Input() allowConvertToRuleset = false;
   @Input() allowCollapse = true;
+  @Input() allowRuleUpDown = false;
   @Input() emptyMessage = 'A ruleset cannot be empty. Please add a rule or remove it all together.';
   @Input() classNames!: QueryBuilderClassNames;
   @Input() operatorMap!: Record<string, string[]>;
@@ -458,6 +461,32 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     this.fieldContextCache.delete(rule);
     this.entityContextCache.delete(rule);
     this.ruleRemoveButtonContextCache.delete(rule);
+
+    this.handleTouched();
+    this.handleDataChange();
+  }
+
+  moveRuleUp(rule: Rule | RuleSet, parent?: RuleSet): void {
+    this.moveRule(rule, parent, -1);
+  }
+
+  moveRuleDown(rule: Rule | RuleSet, parent?: RuleSet): void {
+    this.moveRule(rule, parent, 1);
+  }
+
+  private moveRule(rule: Rule | RuleSet, parent: RuleSet | undefined, step: number): void {
+    if (this.disabled) {
+      return;
+    }
+
+    parent = parent || this.data;
+    const index = parent.rules.indexOf(rule);
+    const newIndex = index + step;
+    if (index === -1 || newIndex < 0 || newIndex >= parent.rules.length) {
+      return;
+    }
+    parent.rules.splice(index, 1);
+    parent.rules.splice(newIndex, 0, rule);
 
     this.handleTouched();
     this.handleDataChange();

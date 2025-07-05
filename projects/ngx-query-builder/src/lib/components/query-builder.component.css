@@ -25,6 +25,18 @@
     }
   }
 
+  .q-up-icon {
+    &::before {
+      content: '⬆';
+    }
+  }
+
+  .q-down-icon {
+    &::before {
+      content: '⬇';
+    }
+  }
+
   .q-arrow-icon {
     &::before {
       content: '▶'
