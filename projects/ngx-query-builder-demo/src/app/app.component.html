@@ -1,8 +1,8 @@
 <main class="main">
   <div class="content">
     <ngx-query-builder [formControl]='queryCtrl' [config]='currentConfig' [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse' [allowNot]='allowNot' [persistValueOnFieldChange]='persistValueOnFieldChange'>
-      <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
-      <textarea class="text-input text-area" [(ngModel)]="rule.value" [disabled]=getDisabledState()
+      <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState; let onChange=onChange">
+      <textarea class="text-input text-area" [(ngModel)]="rule.value" (ngModelChange)="onChange()" [disabled]=getDisabledState()
                 placeholder="Custom Textarea"></textarea>
       </ng-container>
     </ngx-query-builder>
