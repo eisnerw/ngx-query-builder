@@ -27,13 +27,13 @@
 
   .q-up-icon {
     &::before {
-      content: '⬆';
+      content: '▲';
     }
   }
 
   .q-down-icon {
     &::before {
-      content: '⬇';
+      content: '▼';
     }
   }
 

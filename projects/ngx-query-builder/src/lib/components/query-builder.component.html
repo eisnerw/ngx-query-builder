@@ -125,6 +125,16 @@
           <ng-container *ngTemplateOutlet="_rulesetAddRulesetButtonTpl"></ng-container>
         </ng-container>
       </ng-container>
+      <ng-container *ngIf="allowRuleUpDown && parentValue && parentValue.rules.length > 1">
+        <button type="button" (click)="moveRuleUp(data, parentValue)" [ngClass]="getClassNames('button')"
+                [disabled]="disabled || parentValue.rules[0] === data">
+          <i [ngClass]="getClassNames('upIcon')"></i>
+        </button>
+        <button type="button" (click)="moveRuleDown(data, parentValue)" [ngClass]="getClassNames('button')"
+                [disabled]="disabled || parentValue.rules[parentValue.rules.length - 1] === data">
+          <i [ngClass]="getClassNames('downIcon')"></i>
+        </button>
+      </ng-container>
       <ng-container *ngIf="!!parentValue && allowRuleset">
         <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
       </ng-container>
