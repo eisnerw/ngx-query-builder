@@ -1,0 +1,16 @@
+.bql-container {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.text-display {
+  flex: 1;
+  padding: 0.25rem;
+  border: 1px solid #ccc;
+  min-height: 1.5rem;
+}
+
+input[pInputText] {
+  flex: 1;
+}

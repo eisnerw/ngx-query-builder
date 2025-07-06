@@ -46,6 +46,49 @@
         }
       }
     },
+    "popup-ngx-query-builder": {
+      "projectType": "library",
+      "root": "projects/popup-ngx-query-builder",
+      "sourceRoot": "projects/popup-ngx-query-builder/src",
+      "prefix": "popup",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/popup-ngx-query-builder/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/popup-ngx-query-builder/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/popup-ngx-query-builder/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/popup-ngx-query-builder/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/popup-ngx-query-builder/**/*.ts",
+              "projects/popup-ngx-query-builder/**/*.html"
+            ],
+            "eslintConfig": "projects/ngx-query-builder/eslint.config.js"
+          }
+        }
+      }
+    },
     "ngx-query-builder-demo": {
       "projectType": "application",
       "schematics": {

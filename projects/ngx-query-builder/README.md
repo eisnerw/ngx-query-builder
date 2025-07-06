@@ -305,3 +305,7 @@ npm link ngx-query-builder
 ```
 
 That's it.
+
+## popup-ngx-query-builder
+
+The `popup-ngx-query-builder` library included in this repository provides a simple component that binds an editable BQL string to an `ngx-query-builder` instance displayed in a PrimeNG dialog. It serves as a starting point for applications that need to edit a boolean query both as text and using the visual query builder.

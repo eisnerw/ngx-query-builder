@@ -1,0 +1,14 @@
+{
+  "name": "popup-ngx-query-builder",
+  "version": "0.1.0",
+  "peerDependencies": {
+    "@angular/common": "^19.0.0",
+    "@angular/core": "^19.0.0",
+    "primeng": "^17.0.0",
+    "@kerwin612/ngx-query-builder": "^0.6.5"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}
