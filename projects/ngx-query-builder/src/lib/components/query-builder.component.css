@@ -27,7 +27,8 @@
 
   .q-equal-icon {
     fill: currentColor;
-    vertical-align: text-bottom;
+    vertical-align: -1px;
+    color: rgb(52 47 167)
   }
 
   .q-up-icon {
