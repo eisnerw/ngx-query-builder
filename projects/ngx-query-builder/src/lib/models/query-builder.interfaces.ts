@@ -84,6 +84,7 @@ export interface QueryBuilderClassNames {
   inputControlSize?: string;
   upIcon?: string;
   downIcon?: string;
+  equalIcon?: string;
   collapsedSummary?: string;
 }
 

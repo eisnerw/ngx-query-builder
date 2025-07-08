@@ -41,7 +41,10 @@
                       <i [ngClass]="getClassNames('downIcon')"></i>
                     </button>
                     <button *ngIf="allowConvertToRuleset" type="button" (click)="convertToRuleset(rule, data)" [title]="'Convert to a ' + rulesetName" [ngClass]="getClassNames('button')" [disabled]="disabled">
-                      = {{rulesetName}}
+                      <svg [ngClass]="getClassNames('equalIcon')" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                        <path d="M1 3h10v2H1zM1 7h10v2H1z"/>
+                      </svg>
+                      {{rulesetName}}
                     </button>
                     <ng-template [ngTemplateOutlet]="_ruleRemoveButtonTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
                   </div>
@@ -141,7 +144,10 @@
       </ng-container>
       <button *ngIf="allowConvertToRuleset && parentValue && data.rules.length === 1" type="button"
               (click)="convertRulesetToRule(data, parentValue)" [title]="'Convert to a ' + ruleName" [ngClass]="getClassNames('button')" [disabled]="disabled">
-        = {{ruleName}}
+        <svg [ngClass]="getClassNames('equalIcon')" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+          <path d="M1 3h10v2H1zM1 7h10v2H1z"/>
+        </svg>
+        {{ruleName}}
       </button>
       <ng-container *ngIf="!!parentValue">
         <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>

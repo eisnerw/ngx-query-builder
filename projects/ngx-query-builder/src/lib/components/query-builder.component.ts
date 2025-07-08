@@ -108,6 +108,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     inputControlSize: 'q-control-size',
     upIcon: 'q-icon q-up-icon',
     downIcon: 'q-icon q-down-icon',
+    equalIcon: 'q-icon q-equal-icon',
     collapsedSummary: 'q-collapsed-summary'
   };
   public defaultOperatorMap: Record<string, string[]> = {
