@@ -125,9 +125,16 @@ export class AppComponent implements OnInit {
       },
       repositories: {
         name: 'Repositories',
-        type: 'category'
+        type: 'category',
+        validator: (r, p) => this.repositoriesValidator(r, p),
+        categorySource: (r, p) => this.repositoriesCategorySource(r, p)
       },
-      github: {name: 'Github Id', type: 'string'}  
+      github: {
+        name: 'Github Id',
+        type: 'string',
+        validator: (r, p) => this.githubValidator(r),
+        operators: ['=']
+      }
     }
   };
 
@@ -154,6 +161,59 @@ export class AppComponent implements OnInit {
     };
     walk(ruleset);
     return Array.from(names).join(', ');
+  }
+
+  private githubValidator(rule: Rule): any | null {
+    const id = String(rule.value || '').trim();
+    if (!id) {
+      return { field: rule.field, error: 'required' };
+    }
+    try {
+      const req = new XMLHttpRequest();
+      req.open('GET', `https://api.github.com/users/${encodeURIComponent(id)}`, false);
+      req.send();
+      if (req.status === 404) {
+        return { field: rule.field, error: 'notfound' };
+      }
+    } catch {
+      return { field: rule.field, error: 'notfound' };
+    }
+    return null;
+  }
+
+  private repositoriesValidator(rule: Rule, parent: RuleSet): any | null {
+    if (parent.condition !== 'and') {
+      return { field: rule.field, error: 'parent-not-and' };
+    }
+    const githubRule = parent.rules.find(r => (r as Rule).field === 'github') as Rule | undefined;
+    if (!githubRule) {
+      return { field: rule.field, error: 'missing-github' };
+    }
+    const err = this.githubValidator(githubRule);
+    if (err) {
+      return { field: rule.field, error: 'invalid-github' };
+    }
+    return null;
+  }
+
+  private repositoriesCategorySource(rule: Rule, parent: RuleSet): string[] | null {
+    const githubRule = parent.rules.find(r => (r as Rule).field === 'github') as Rule | undefined;
+    const id = githubRule && String(githubRule.value || '').trim();
+    if (!id) {
+      return null;
+    }
+    try {
+      const req = new XMLHttpRequest();
+      req.open('GET', `https://api.github.com/users/${encodeURIComponent(id)}/repos`, false);
+      req.send();
+      if (req.status === 200) {
+        const data = JSON.parse(req.responseText);
+        return Array.isArray(data) ? data.map((d: any) => d.name) : null;
+      }
+    } catch {
+      // ignore errors
+    }
+    return null;
   }
 
   updateCollapsedSummary() {

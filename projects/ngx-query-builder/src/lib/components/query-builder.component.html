@@ -242,7 +242,7 @@
 <!--_inputTpl-->
 <ng-template #_inputTpl let-rule>
   <ng-container *ngIf="findTemplateForRule(rule) as template; else defaultInput">
-    <ng-container *ngTemplateOutlet="template; context: getInputContext(rule)"></ng-container>
+    <ng-container *ngTemplateOutlet="template; context: getInputContext(rule, data)"></ng-container>
   </ng-container>
   <ng-template #defaultInput>
     <div [ngClass]="getClassNames('inputControlSize')" [ngSwitch]="getInputType(rule.field, rule.operator || '')">
@@ -256,14 +256,14 @@
              [disabled]="disabled" *ngSwitchCase="'time'" type="time">
       <select [ngClass]="getClassNames('inputControl')" [(ngModel)]="rule.value" (ngModelChange)="changeInput()"
               [disabled]="disabled" *ngSwitchCase="'category'">
-        <option *ngFor="let opt of getOptions(rule.field)" [ngValue]="opt.value">
+        <option *ngFor="let opt of getOptions(rule.field, rule, data)" [ngValue]="opt.value">
           {{opt.name}}
         </option>
       </select>
       <ng-container *ngSwitchCase="'multiselect'">
         <select [ngClass]="getClassNames('inputControl')" [(ngModel)]="rule.value" (ngModelChange)="changeInput()"
                 [disabled]="disabled" multiple>
-          <option *ngFor="let opt of getOptions(rule.field)" [ngValue]="opt.value">
+          <option *ngFor="let opt of getOptions(rule.field, rule, data)" [ngValue]="opt.value">
             {{opt.name}}
           </option>
         </select>

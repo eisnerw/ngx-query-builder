@@ -375,11 +375,18 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
   }
 
-  getOptions(field: string): Option[] {
+  getOptions(field: string, rule?: Rule, parent?: RuleSet): Option[] {
     if (this.config.getOptions) {
       return this.config.getOptions(field);
     }
-    return this.config.fields[field].options || this.defaultEmptyList;
+    const conf = this.config.fields[field];
+    if (conf.categorySource && rule && parent) {
+      const cats = conf.categorySource(rule, parent);
+      if (cats && cats.length) {
+        return cats.map((c) => ({ name: c, value: c }));
+      }
+    }
+    return conf.options || this.defaultEmptyList;
   }
 
   getClassNames(...args: any[]): string | undefined {
@@ -910,15 +917,19 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return this.operatorContextCache.get(rule);
   }
 
-  getInputContext(rule: Rule): InputContext | undefined {
+  getInputContext(rule: Rule, parent: RuleSet = this.data): InputContext | undefined {
+    const opts = this.getOptions(rule.field, rule, parent);
     if (!this.inputContextCache.has(rule)) {
       this.inputContextCache.set(rule, {
         onChange: this.changeInput.bind(this),
         getDisabledState: this.getDisabledState,
-        options: this.getOptions(rule.field),
+        options: opts,
         field: this.config.fields[rule.field],
         $implicit: rule
       });
+    } else {
+      const ctx = this.inputContextCache.get(rule)!;
+      ctx.options = opts;
     }
     return this.inputContextCache.get(rule);
   }
