@@ -25,6 +25,11 @@
     }
   }
 
+  .q-equal-icon {
+    fill: #555;
+    vertical-align: text-bottom;
+  }
+
   .q-up-icon {
     &::before {
       content: '▲';
