@@ -40,8 +40,8 @@
                             [disabled]="disabled || i === data.rules.length - 1">
                       <i [ngClass]="getClassNames('downIcon')"></i>
                     </button>
-                    <button *ngIf="allowConvertToRuleset" type="button" (click)="convertToRuleset(rule, data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
-                      Convert to Ruleset
+                    <button *ngIf="allowConvertToRuleset" type="button" (click)="convertToRuleset(rule, data)" [title]="'Convert to a ' + rulesetName" [ngClass]="getClassNames('button')" [disabled]="disabled">
+                      = {{rulesetName}}
                     </button>
                     <ng-template [ngTemplateOutlet]="_ruleRemoveButtonTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
                   </div>
@@ -140,8 +140,8 @@
         </button>
       </ng-container>
       <button *ngIf="allowConvertToRuleset && parentValue && data.rules.length === 1" type="button"
-              (click)="convertRulesetToRule(data, parentValue)" [ngClass]="getClassNames('button')" [disabled]="disabled">
-        Convert to Rule
+              (click)="convertRulesetToRule(data, parentValue)" [title]="'Convert to a ' + ruleName" [ngClass]="getClassNames('button')" [disabled]="disabled">
+        = {{ruleName}}
       </button>
       <ng-container *ngIf="!!parentValue">
         <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
@@ -158,7 +158,7 @@
 
   <ng-template #defaultRulesetAddRuleButton>
     <button type="button" (click)="addRule()" [ngClass]="getClassNames('button')" [disabled]=disabled>
-      <i [ngClass]="getClassNames('addIcon')"></i> Rule
+      <i [ngClass]="getClassNames('addIcon')"></i> {{ruleName}}
     </button>
   </ng-template>
 </ng-template>
@@ -171,7 +171,7 @@
 
   <ng-template #defaultRulesetAddRulesetButton>
     <button type="button" (click)="addRuleSet()" [ngClass]="getClassNames('button')" *ngIf="allowRuleset" [disabled]=disabled>
-      <i [ngClass]="getClassNames('addIcon')"></i> Ruleset
+      <i [ngClass]="getClassNames('addIcon')"></i> {{rulesetName}}
     </button>
   </ng-template>
 </ng-template>
