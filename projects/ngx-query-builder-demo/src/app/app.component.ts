@@ -132,7 +132,8 @@ export class AppComponent implements OnInit {
       github: {
         name: 'Github Id',
         type: 'string',
-        validator: (r, p) => this.githubValidator(r)
+        validator: (r, p) => this.githubValidator(r),
+        operators: ['=']
       }
     }
   };
