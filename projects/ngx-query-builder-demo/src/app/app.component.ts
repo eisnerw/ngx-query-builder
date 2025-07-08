@@ -301,12 +301,12 @@ export class AppComponent implements OnInit {
       if (r && typeof r === 'object' && 'rules' in r) {
         return this.validateRuleset(r);
       } else {
-        return this.validateRule(r);
+        return this.validateRule(r, ruleset);
       }
     });
   }
 
-  private validateRule(rule: any): boolean {
+  private validateRule(rule: any, parent?: RuleSet): boolean {
     if (!rule || typeof rule !== 'object' || Array.isArray(rule)) {
       return false;
     }
@@ -370,18 +370,20 @@ export class AppComponent implements OnInit {
           }
           break;
         case 'category':
+          const optionValues = fieldConf.options
+            ? fieldConf.options.map(o => o.value)
+            : (fieldConf.categorySource && parent
+              ? fieldConf.categorySource(rule, parent)
+              : null);
           if (rule.operator === 'in' || rule.operator === 'not in') {
             if (!Array.isArray(val) || val.length === 0) {
               return false;
             }
-            if (
-              fieldConf.options &&
-              val.some((v: any) => !fieldConf.options!.some(o => o.value === v))
-            ) {
+            if (optionValues && val.some((v: any) => !optionValues!.includes(v))) {
               return false;
             }
           } else {
-            if (!fieldConf.options || !fieldConf.options.some(o => o.value === val)) {
+            if (optionValues && !optionValues.includes(val)) {
               return false;
             }
           }
