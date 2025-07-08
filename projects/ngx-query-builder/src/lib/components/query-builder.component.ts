@@ -154,6 +154,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   @ViewChild('treeContainer', {static: true}) treeContainer!: ElementRef;
   public collapsed = false;
+  public hoveringSwitchGroup = false;
 
   @ContentChild(QueryButtonGroupDirective) buttonGroupTemplate!: QueryButtonGroupDirective;
   @ContentChild(QuerySwitchGroupDirective) switchGroupTemplate!: QuerySwitchGroupDirective;
