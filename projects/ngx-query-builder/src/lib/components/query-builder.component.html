@@ -143,7 +143,7 @@
               (click)="convertRulesetToRule(data, parentValue)" [ngClass]="getClassNames('button')" [disabled]="disabled">
         Convert to Rule
       </button>
-      <ng-container *ngIf="!!parentValue && allowRuleset">
+      <ng-container *ngIf="!!parentValue">
         <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
       </ng-container>
     </div>
