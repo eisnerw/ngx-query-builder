@@ -146,6 +146,9 @@ export class AppComponent implements OnInit {
   public allowRuleUpDown: boolean = false;
   public persistValueOnFieldChange: boolean = false;
   public useCollapsedSummary: boolean = false;
+  public ruleName: string = 'Rule';
+  public rulesetName: string = 'Ruleset';
+  public useExpressionNames: boolean = false;
 
   public collapsedSummary(ruleset: RuleSet): string {
     const names = new Set<string>();
@@ -453,5 +456,15 @@ export class AppComponent implements OnInit {
   changeLevelLimit(event: Event) {
     this.currentConfig = {...this.currentConfig, levelLimit: parseInt((<HTMLInputElement>event.target).value, 10)} as QueryBuilderConfig;
     this.updateCollapsedSummary();
+  }
+
+  toggleExpressionNames() {
+    if (this.useExpressionNames) {
+      this.ruleName = 'Expression';
+      this.rulesetName = 'Query';
+    } else {
+      this.ruleName = 'Rule';
+      this.rulesetName = 'Ruleset';
+    }
   }
 }
