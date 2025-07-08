@@ -91,7 +91,7 @@ export class AppComponent implements OnInit {
           {name: 'Unemployed', value: 'unemployed'},
           {name: 'Scientist', value: 'scientist'}
         ]
-      }
+      }    
     }
   };
 
@@ -122,7 +122,12 @@ export class AppComponent implements OnInit {
           {name: 'Unemployed', value: 'unemployed'},
           {name: 'Scientist', value: 'scientist'}
         ]
-      }
+      },
+      repositories: {
+        name: 'Repositories',
+        type: 'category'
+      },
+      github: {name: 'Github Id', type: 'string'}  
     }
   };
 
