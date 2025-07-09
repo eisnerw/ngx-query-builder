@@ -105,7 +105,7 @@
           <ng-container *ngIf="data.rules.length !== 1">NOT</ng-container>
         </label>
       </div>
-      <div [ngClass]="getClassNames('switchControl')" *ngIf="hoveringSwitchGroup || data.condition === 'and' || data.rules.length === 1">
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="hoveringSwitchGroup || data.condition === 'and'">
         <input type="radio" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.condition" [disabled]=disabled
                value="and" #andOption />
         <label (click)="changeCondition(andOption.value)" [ngClass]="getClassNames('switchLabel')">
@@ -113,7 +113,7 @@
           <ng-template #blankAnd><span class="q-switch-label-empty">AND</span></ng-template>
         </label>
       </div>
-      <div [ngClass]="getClassNames('switchControl')" *ngIf="hoveringSwitchGroup || data.condition === 'or' || data.rules.length === 1">
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="hoveringSwitchGroup || data.condition === 'or'">
         <input type="radio" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.condition" [disabled]=disabled
                value="or" #orOption />
         <label (click)="changeCondition(orOption.value)" [ngClass]="getClassNames('switchLabel')">
