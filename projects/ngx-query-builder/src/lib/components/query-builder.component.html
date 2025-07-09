@@ -8,14 +8,15 @@
       <ng-template [ngTemplateOutlet]="_switchGroupTpl"/>
 
       <span *ngIf="namingRuleset === data" class="q-name-edit">
-        <input [(ngModel)]="namingRulesetName" class="q-name-input" />
+        <input [(ngModel)]="namingRulesetName" class="q-name-input" (input)="onNamingInput($event)" />
         <button type="button" (click)="confirmNamingRuleset()" [ngClass]="getClassNames('button')">✓</button>
         <button type="button" (click)="cancelNamingRuleset()" [ngClass]="getClassNames('button')">✕</button>
       </span>
       <span *ngIf="!data.name && config.saveNamedRuleset && !isRulesetInvalid(data) && namingRuleset !== data" class="q-name-text" (click)="startNamingRuleset(data)">Click to name {{rulesetName}}</span>
 
-      <button *ngIf="data.name && config.getNamedRuleset && config.saveNamedRuleset && config.deleteNamedRuleset" type="button" class="q-name-action" (click)="namedRulesetAction(data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
+      <button *ngIf="data.name && config.getNamedRuleset && config.saveNamedRuleset && config.deleteNamedRuleset" type="button" class="q-name-action" (click)="namedRulesetAction(data)" [ngClass]="getClassNames('button')" [disabled]="disabled" [title]="namedRulesetModified(data) ? rulesetName + ' has been modified needs to be saved, renamed or unnamed' : null">
         <i [ngClass]="getClassNames(namedRulesetModified(data) ? 'saveIcon' : 'searchIcon')"></i>
+        <span class="q-name-label" [ngClass]="{'q-name-modified': namedRulesetModified(data)}">{{data.name}}</span>
       </button>
 
       <ng-template [ngTemplateOutlet]="_buttonGroupTpl"/>
