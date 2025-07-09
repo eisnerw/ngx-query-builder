@@ -137,6 +137,10 @@
     padding: 0 8px;
   }
 
+  .q-switch-label-empty {
+    visibility: hidden;
+  }
+
   .q-switch-radio {
     position: absolute;
     clip: rect(0, 0, 0, 0);
