@@ -5,6 +5,8 @@
         <ng-template [ngTemplateOutlet]="_arrowIconTpl"/>
       </a>
 
+      <span *ngIf="!data.name && config.saveNamedRuleset && !isRulesetInvalid(data)" class="q-name-text" (click)="nameRuleset(data)">Click to name {{rulesetName}}</span>
+
       <ng-template [ngTemplateOutlet]="_switchGroupTpl"/>
 
       <ng-template [ngTemplateOutlet]="_buttonGroupTpl"/>
@@ -146,6 +148,10 @@
       <div class="q-buttons">
       <ng-container *ngIf="!config.rulesLimit || data.rules.length < config.rulesLimit">
         <ng-container *ngTemplateOutlet="_rulesetAddRuleButtonTpl"></ng-container>
+        <button *ngIf="config.listNamedRulesets && config.getNamedRuleset" type="button"
+                (click)="addNamedRuleSet()" [ngClass]="getClassNames('button')" [disabled]="disabled">
+          <i [ngClass]="getClassNames('addIcon')"></i> Named {{rulesetName}}
+        </button>
         <ng-container *ngIf="!config.levelLimit || level + 1 < config.levelLimit">
           <ng-container *ngTemplateOutlet="_rulesetAddRulesetButtonTpl"></ng-container>
         </ng-container>
@@ -167,9 +173,13 @@
         </svg>
         {{ruleName}}
       </button>
-        <ng-container *ngIf="!!parentValue">
-          <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
-        </ng-container>
+      <button *ngIf="data.name && config.getNamedRuleset && config.saveNamedRuleset && config.deleteNamedRuleset" type="button"
+              (click)="namedRulesetAction(data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
+        <i [ngClass]="getClassNames(namedRulesetModified(data) ? 'saveIcon' : 'searchIcon')"></i> {{rulesetName}}: {{data.name}}
+      </button>
+      <ng-container *ngIf="!!parentValue">
+        <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
+      </ng-container>
       </div>
     </div>
   </ng-template>

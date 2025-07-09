@@ -1,6 +1,7 @@
 export interface RuleSet {
   condition: string;
   rules: (RuleSet | Rule)[];
+  name?: string;
   not?: boolean;
   collapsed?: boolean;
   isChild?: boolean;
@@ -85,6 +86,8 @@ export interface QueryBuilderClassNames {
   upIcon?: string;
   downIcon?: string;
   equalIcon?: string;
+  searchIcon?: string;
+  saveIcon?: string;
   collapsedSummary?: string;
 }
 
@@ -106,6 +109,10 @@ export interface QueryBuilderConfig {
                                nextField: Field | undefined,
                                currentValue: any) => any;
   customCollapsedSummary?: (ruleset: RuleSet) => string;
+  listNamedRulesets?: () => string[];
+  getNamedRuleset?: (name: string) => RuleSet;
+  saveNamedRuleset?: (ruleset: RuleSet) => void;
+  deleteNamedRuleset?: (name: string) => void;
 }
 
 export interface SwitchGroupContext {

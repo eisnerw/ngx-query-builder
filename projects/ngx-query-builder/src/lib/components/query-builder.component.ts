@@ -71,6 +71,7 @@ export const VALIDATOR: any = {
   standalone: false
 })
 export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, Validator {
+  private static parentMap = new WeakMap<RuleSet, RuleSet | null>();
   public fields!: Field[];
   public entities!: Entity[];
   public defaultClassNames: QueryBuilderClassNames = {
@@ -109,7 +110,9 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     upIcon: 'q-icon q-up-icon',
     downIcon: 'q-icon q-down-icon',
     equalIcon: 'q-icon q-equal-icon',
-    collapsedSummary: 'q-collapsed-summary'
+    collapsedSummary: 'q-collapsed-summary',
+    searchIcon: 'q-icon q-search-icon',
+    saveIcon: 'q-icon q-save-icon'
   };
   public defaultOperatorMap: Record<string, string[]> = {
     string: ['=', '!=', 'contains', 'like'],
@@ -214,6 +217,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         this.entities = [];
       }
       this.operatorsCache = {};
+      this.registerParentRefs(this.data, this.parentValue || null);
     } else {
       throw new Error(`Expected 'config' must be a valid object, got ${type} instead.`);
     }
@@ -268,6 +272,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   set value(value: RuleSet) {
     // When component is initialized without a formControl, null is passed to value
     this.data = value || { condition: 'and', rules: [] };
+    this.registerParentRefs(this.data, this.parentValue || null);
     this.handleDataChange();
   }
 
@@ -579,6 +584,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
 
     if (newRuleset) {
+      this.registerParentRefs(newRuleset, parent);
       this.addRule(newRuleset);
     }
   }
@@ -1190,6 +1196,117 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
     
     return cleanedData;
+  }
+
+  private registerParentRefs(ruleset: RuleSet, parent: RuleSet | null): void {
+    QueryBuilderComponent.parentMap.set(ruleset, parent);
+    if (ruleset.rules) {
+      ruleset.rules.forEach(r => {
+        if (this.isRuleset(r)) {
+          this.registerParentRefs(r, ruleset);
+        }
+      });
+    }
+  }
+
+  private getAncestorNames(ruleset: RuleSet | null): string[] {
+    const names: string[] = [];
+    let current = ruleset;
+    while (current) {
+      if ((current as any).name) {
+        names.push((current as any).name);
+      }
+      current = QueryBuilderComponent.parentMap.get(current) || null;
+    }
+    return names;
+  }
+
+  private isValidRulesetName(name: string, current?: RuleSet): boolean {
+    if (!/^[A-Z0-9_]+$/.test(name) || !/[A-Z]/.test(name)) {
+      return false;
+    }
+    const existing = this.config.listNamedRulesets ? this.config.listNamedRulesets() : [];
+    if (current && current.name === name) {
+      return true;
+    }
+    return existing.indexOf(name) === -1;
+  }
+
+  addNamedRuleSet(parent?: RuleSet): void {
+    if (this.disabled || !this.config.listNamedRulesets || !this.config.getNamedRuleset) {
+      return;
+    }
+    parent = parent || this.data;
+    const excluded = this.getAncestorNames(parent);
+    const names = this.config.listNamedRulesets().filter(n => excluded.indexOf(n) === -1);
+    if (names.length === 0) {
+      return;
+    }
+    const selection = window.prompt('Select a Named ' + this.rulesetName + '\n' + names.join('\n'));
+    if (selection && names.includes(selection)) {
+      const rs = JSON.parse(JSON.stringify(this.config.getNamedRuleset!(selection)));
+      this.registerParentRefs(rs, parent);
+      parent.rules.push(rs);
+      this.handleTouched();
+      this.handleDataChange();
+    }
+  }
+
+  namedRulesetModified(ruleset: RuleSet): boolean {
+    if (!ruleset.name || !this.config.getNamedRuleset) { return false; }
+    const saved = this.config.getNamedRuleset(ruleset.name);
+    if (!saved) { return false; }
+    const a = JSON.stringify({ ...ruleset, name: undefined });
+    const b = JSON.stringify({ ...saved, name: undefined });
+    return a !== b;
+  }
+
+  namedRulesetAction(ruleset: RuleSet = this.data): void {
+    if (!ruleset.name || !this.config.getNamedRuleset || !this.config.saveNamedRuleset || !this.config.deleteNamedRuleset) {
+      return;
+    }
+    const modified = this.namedRulesetModified(ruleset);
+    let msg = 'Rename or delete ' + this.rulesetName + ' "' + ruleset.name + '"';
+    if (modified) { msg += '\nType UPDATE to overwrite existing definition.'; }
+    const result = window.prompt(msg, ruleset.name);
+    if (result === null) { return; }
+    if (result === '') {
+      if (confirm('Delete named ' + this.rulesetName + ' ' + ruleset.name + '?')) {
+        this.config.deleteNamedRuleset(ruleset.name);
+        delete ruleset.name;
+        this.handleTouched();
+        this.handleDataChange();
+      }
+      return;
+    }
+    if (modified && result === 'UPDATE') {
+      this.config.saveNamedRuleset(ruleset);
+      return;
+    }
+    const newName = result.trim();
+    if (!this.isValidRulesetName(newName, ruleset)) {
+      alert('Invalid name');
+      return;
+    }
+    if (ruleset.name !== newName) {
+      this.config.deleteNamedRuleset(ruleset.name);
+      ruleset.name = newName;
+    }
+    this.config.saveNamedRuleset(ruleset);
+    this.handleTouched();
+    this.handleDataChange();
+  }
+
+  nameRuleset(ruleset: RuleSet = this.data): void {
+    if (!this.config.saveNamedRuleset) { return; }
+    const name = window.prompt('Enter name for ' + this.rulesetName);
+    if (!name) { return; }
+    if (!this.isValidRulesetName(name)) { alert('Invalid name'); return; }
+    ruleset.name = name;
+    this.registerParentRefs(ruleset, QueryBuilderComponent.parentMap.get(ruleset) || null);
+    this.config.saveNamedRuleset(ruleset);
+    this.handleTouched();
+    this.handleDataChange();
   }
 
 }
