@@ -962,9 +962,8 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     const field = this.config.fields[rule.field];
     if (field && field.validator) {
       return field.validator(rule, parent) != null;
-    } else if (field && field.type === 'textarea') {
-      const requiresValue = rule.operator !== 'is null' && rule.operator !== 'is not null';
-      return requiresValue && (typeof rule.value !== 'string' || rule.value.trim() === '');
+    } else if (field) {
+      return this.isValueMissingForRule(rule, field);
     }
     return false;
   }
@@ -1021,6 +1020,40 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
   }
 
+  private isValueMissingForRule(rule: Rule, field: Field): boolean {
+    if (rule.operator === 'is null' || rule.operator === 'is not null') {
+      return false;
+    }
+    const val = rule.value;
+    switch (field.type) {
+      case 'string':
+      case 'textarea':
+        return typeof val !== 'string' || val.trim() === '';
+      case 'number':
+        return typeof val !== 'number' || isNaN(val);
+      case 'time':
+        return typeof val !== 'string' || !/^\d{2}:\d{2}(:\d{2})?$/.test(val);
+      case 'date':
+        if (val instanceof Date) {
+          return isNaN(val.getTime());
+        } else if (typeof val === 'string') {
+          return !/^\d{4}-\d{2}-\d{2}$/.test(val) || isNaN(Date.parse(val));
+        }
+        return true;
+      case 'category':
+        if (rule.operator === 'in' || rule.operator === 'not in') {
+          return !Array.isArray(val) || val.length === 0;
+        }
+        return val === undefined || val === null;
+      case 'boolean':
+        return val !== true && val !== false;
+      case 'multiselect':
+        return !Array.isArray(val);
+      default:
+        return val === undefined || val === null;
+    }
+  }
+
   private validateRulesInRuleset(ruleset: RuleSet, errorStore: any[]) {
     if (ruleset && ruleset.rules && ruleset.rules.length > 0) {
       ruleset.rules.forEach((item) => {
@@ -1033,12 +1066,8 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
             if (error != null) {
               errorStore.push(error);
             }
-          } else if (field && field.type === 'textarea') {
-            const rule = item as Rule;
-            const requiresValue = rule.operator !== 'is null' && rule.operator !== 'is not null';
-            if (requiresValue && (typeof rule.value !== 'string' || rule.value.trim() === '')) {
-              errorStore.push({ field: rule.field, error: 'required' });
-            }
+          } else if (field && this.isValueMissingForRule(item as Rule, field)) {
+            errorStore.push({ field: (item as Rule).field, error: 'required' });
           }
         }
       });
