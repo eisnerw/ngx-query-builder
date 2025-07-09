@@ -9,7 +9,7 @@ export interface NamedRulesetDialogData {
 }
 
 export interface NamedRulesetDialogResult {
-  action: 'save' | 'delete' | 'cancel';
+  action: 'save' | 'delete' | 'cancel' | 'removeName';
   name?: string;
 }
 
@@ -28,6 +28,7 @@ export interface NamedRulesetDialogResult {
     <div mat-dialog-actions>
       <button mat-button (click)="dialogRef.close({action: 'cancel'})">Cancel</button>
       <button mat-button color="warn" *ngIf="data.allowDelete" (click)="dialogRef.close({action: 'delete'})">Delete</button>
+      <button mat-button color="warn" (click)="dialogRef.close({action: 'removeName'})">Remove Name</button>
       <button mat-raised-button color="primary" [disabled]="!name" (click)="dialogRef.close({action: 'save', name})">Save</button>
     </div>
   `
