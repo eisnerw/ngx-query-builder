@@ -8,6 +8,7 @@ export interface AddNamedRulesetDialogData {
 
 @Component({
   selector: 'lib-add-named-ruleset-dialog',
+  standalone: false,
   template: `
     <h1 mat-dialog-title>Select a Named {{data.rulesetName}}</h1>
     <div mat-dialog-content>

@@ -15,6 +15,7 @@ export interface NamedRulesetDialogResult {
 
 @Component({
   selector: 'lib-named-ruleset-dialog',
+  standalone: false,
   template: `
     <h1 mat-dialog-title>Save {{data.rulesetName}}</h1>
     <div mat-dialog-content>
