@@ -15,6 +15,7 @@ export class AppComponent implements OnInit {
   public queryTitle = '';
 
   public namedRulesets: Record<string, RuleSet> = {};
+  public useSavedRulesets = false;
 
   public bootstrapClassNames: QueryBuilderClassNames = {
     removeIcon: 'fa fa-minus',
@@ -240,6 +241,27 @@ export class AppComponent implements OnInit {
     delete this.namedRulesets[name];
   }
 
+  updateNamedRulesetsUsage() {
+    if (this.useSavedRulesets) {
+      this.currentConfig = {
+        ...this.currentConfig,
+        listNamedRulesets: this.listNamedRulesets.bind(this),
+        getNamedRuleset: this.getNamedRuleset.bind(this),
+        saveNamedRuleset: this.saveNamedRuleset.bind(this),
+        deleteNamedRuleset: this.deleteNamedRuleset.bind(this)
+      } as QueryBuilderConfig;
+    } else {
+      const {
+        listNamedRulesets,
+        getNamedRuleset,
+        saveNamedRuleset,
+        deleteNamedRuleset,
+        ...rest
+      } = this.currentConfig as any;
+      this.currentConfig = rest;
+    }
+  }
+
   updateCollapsedSummary() {
     this.currentConfig = {
       ...this.currentConfig,
@@ -251,14 +273,8 @@ export class AppComponent implements OnInit {
     private formBuilder: FormBuilder
   ) {
     this.queryCtrl = this.formBuilder.control(this.query);
-    this.config = {
-      ...this.config,
-      listNamedRulesets: this.listNamedRulesets.bind(this),
-      getNamedRuleset: this.getNamedRuleset.bind(this),
-      saveNamedRuleset: this.saveNamedRuleset.bind(this),
-      deleteNamedRuleset: this.deleteNamedRuleset.bind(this)
-    } as QueryBuilderConfig;
     this.currentConfig = this.config;
+    this.updateNamedRulesetsUsage();
     this.updateCollapsedSummary();
     this.queryText = JSON.stringify(this.queryCtrl.value, null, 2);
     if (this.validateQuery(this.queryCtrl.value)) {
@@ -310,7 +326,7 @@ export class AppComponent implements OnInit {
       return false;
     }
     const keys = Object.keys(ruleset);
-    if (keys.some(k => !['condition', 'rules', 'not'].includes(k))) {
+    if (keys.some(k => !['condition', 'rules', 'not', 'name'].includes(k))) {
       return false;
     }
     if (!('condition' in ruleset) || !('rules' in ruleset)) {
@@ -320,6 +336,9 @@ export class AppComponent implements OnInit {
       return false;
     }
     if ('not' in ruleset && typeof ruleset.not !== 'boolean') {
+      return false;
+    }
+    if ('name' in ruleset && typeof ruleset.name !== 'string') {
       return false;
     }
     if (!Array.isArray(ruleset.rules)) {
@@ -460,6 +479,7 @@ export class AppComponent implements OnInit {
 
   switchModes(event: Event) {
     this.currentConfig = (<HTMLInputElement>event.target).checked ? this.entityConfig : this.config;
+    this.updateNamedRulesetsUsage();
     this.updateCollapsedSummary();
   }
 

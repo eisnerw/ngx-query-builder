@@ -1240,6 +1240,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     const excluded = this.getAncestorNames(parent);
     const names = this.config.listNamedRulesets().filter(n => excluded.indexOf(n) === -1);
     if (names.length === 0) {
+      window.alert('No saved ' + this.rulesetName + 's available.');
       return;
     }
     const selection = window.prompt('Select a Named ' + this.rulesetName + '\n' + names.join('\n'));
