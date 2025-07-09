@@ -983,6 +983,9 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   isRulesetInvalid(ruleset: RuleSet): boolean {
     if (!ruleset || !ruleset.rules) { return false; }
+    if (ruleset.name && this.namedRulesetModified(ruleset)) {
+      return true;
+    }
     if (!this.config.allowEmptyRulesets && this.isEmptyRuleset(ruleset)) {
       return true;
     }
@@ -1220,6 +1223,81 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return JSON.parse(JSON.stringify(ruleset));
   }
 
+  private updateNamedRulesetInstances(name: string, source: RuleSet, skip?: RuleSet): void {
+    const walk = (rs: RuleSet) => {
+      const parent = QueryBuilderComponent.parentMap.get(rs) || null;
+      if (rs !== skip && rs.name === name) {
+        const clone = this.cloneRuleset(source);
+        clone.name = name;
+        if (parent) {
+          const idx = parent.rules.indexOf(rs);
+          parent.rules[idx] = clone;
+        } else if (rs === this.data) {
+          this.data = clone;
+        }
+        this.registerParentRefs(clone, parent);
+        rs = clone;
+      }
+      if (rs.rules) {
+        rs.rules.forEach(child => {
+          if (this.isRuleset(child)) {
+            walk(child);
+          }
+        });
+      }
+    };
+    walk(this.data);
+  }
+
+  private renameNamedRulesetInstances(oldName: string, newName: string, source: RuleSet, skip?: RuleSet): void {
+    const walk = (rs: RuleSet) => {
+      const parent = QueryBuilderComponent.parentMap.get(rs) || null;
+      if (rs !== skip && rs.name === oldName) {
+        const clone = this.cloneRuleset(source);
+        clone.name = newName;
+        if (parent) {
+          const idx = parent.rules.indexOf(rs);
+          parent.rules[idx] = clone;
+        } else if (rs === this.data) {
+          this.data = clone;
+        }
+        this.registerParentRefs(clone, parent);
+        rs = clone;
+      }
+      if (rs.rules) {
+        rs.rules.forEach(child => {
+          if (this.isRuleset(child)) {
+            walk(child);
+          }
+        });
+      }
+    };
+    walk(this.data);
+  }
+
+  private renameCreatesCycle(oldName: string, newName: string): boolean {
+    let cycle = false;
+    const check = (rs: RuleSet) => {
+      if (cycle) { return; }
+      if (rs.name === oldName) {
+        const ancestors = this.getAncestorNames(rs);
+        if (ancestors.indexOf(newName) !== -1) {
+          cycle = true;
+          return;
+        }
+      }
+      if (rs.rules) {
+        rs.rules.forEach(child => {
+          if (this.isRuleset(child)) {
+            check(child);
+          }
+        });
+      }
+    };
+    check(this.data);
+    return cycle;
+  }
+
   private getAncestorNames(ruleset: RuleSet | null): string[] {
     const names: string[] = [];
     let current = ruleset;
@@ -1237,8 +1315,14 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       return false;
     }
     const existing = this.config.listNamedRulesets ? this.config.listNamedRulesets() : [];
-    if (current && current.name === name) {
-      return true;
+    if (current) {
+      if (current.name === name) {
+        return true;
+      }
+      const ancestorNames = this.getAncestorNames(current);
+      if (ancestorNames.indexOf(name) !== -1) {
+        return false;
+      }
     }
     return existing.indexOf(name) === -1;
   }
@@ -1300,15 +1384,28 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         });
         return;
       }
+      if (result.action === 'removeName') {
+        delete ruleset.name;
+        this.handleTouched();
+        this.handleDataChange();
+        return;
+      }
       const newName = result.name!.trim();
       if (!this.isValidRulesetName(newName, ruleset)) {
         this.dialog.open(MessageDialogComponent, { data: { title: 'Invalid name', message: 'Invalid name' } });
         return;
       }
-      if (ruleset.name !== newName) {
-        this.config.deleteNamedRuleset!(ruleset.name!);
+      const oldName = ruleset.name!;
+      if (oldName !== newName) {
+        if (this.renameCreatesCycle(oldName, newName)) {
+          this.dialog.open(MessageDialogComponent, { data: { title: 'Invalid name', message: 'Invalid name' } });
+          return;
+        }
+        this.renameNamedRulesetInstances(oldName, newName, ruleset, ruleset);
+        this.config.deleteNamedRuleset!(oldName);
         ruleset.name = newName;
       }
+      this.updateNamedRulesetInstances(newName, ruleset, ruleset);
       this.config.saveNamedRuleset!(this.cloneRuleset(ruleset));
       this.handleTouched();
       this.handleDataChange();
@@ -1325,7 +1422,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     const ruleset = this.namingRuleset;
     if (!ruleset) { return; }
     const name = this.namingRulesetName.trim();
-    if (!this.isValidRulesetName(name)) {
+    if (!this.isValidRulesetName(name, ruleset)) {
       this.dialog.open(MessageDialogComponent, {
         data: { title: 'Invalid name', message: 'Invalid name' }
       });
