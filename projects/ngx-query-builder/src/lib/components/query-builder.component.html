@@ -1,4 +1,4 @@
-<ng-container *ngIf="{ruleset: isRuleset(data), invalid: !config.allowEmptyRulesets && isEmptyRuleset(data)} as local">
+<ng-container *ngIf="{ruleset: isRuleset(data), invalidEmpty: !config.allowEmptyRulesets && isEmptyRuleset(data), invalid: isRulesetInvalid(data)} as local">
   <div [ngClass]="getQueryRulesetClassName(local)">
     <div [ngClass]="getClassNames('switchRow')">
       <a *ngIf="allowCollapse" (click)="toggleCollapse()" [ngClass]="getClassNames('arrowIconButton', collapsed ? 'collapsed' : null)">
@@ -31,6 +31,7 @@
 
                   <div [ngClass]="getClassNames('ruleActions')" class="q-button-wrapper" [class.q-hide-buttons]="hideButtons">
                     <span *ngIf="hideButtons" class="q-ellipsis">&hellip;</span>
+                    <span class="q-invalid-message" *ngIf="isRuleInvalid(rule, data)">Invalid {{ruleName}}</span>
                     <div class="q-buttons">
                     <button *ngIf="allowRuleUpDown && data.rules.length > 1" type="button" (click)="moveRuleUp(rule, data)"
                             [ngClass]="getClassNames('button')"
@@ -141,6 +142,7 @@
   <ng-template #defaultButtonGroup>
     <div [ngClass]="getClassNames('buttonGroup', 'rightAlign')" class="q-button-wrapper" [class.q-hide-buttons]="hideButtons">
       <span *ngIf="hideButtons" class="q-ellipsis">&hellip;</span>
+      <span class="q-invalid-message" *ngIf="isRulesetInvalid(data)">Invalid {{rulesetName}}</span>
       <div class="q-buttons">
       <ng-container *ngIf="!config.rulesLimit || data.rules.length < config.rulesLimit">
         <ng-container *ngTemplateOutlet="_rulesetAddRuleButtonTpl"></ng-container>
@@ -318,13 +320,13 @@
 <!--_emptyWarningTpl-->
 <ng-template #_emptyWarningTpl let-local>
   <ng-container *ngIf="getEmptyWarningTemplate() as template; else defaultEmptyWarning">
-    <ng-container *ngIf="local.invalid">
+    <ng-container *ngIf="local.invalidEmpty">
       <ng-container *ngTemplateOutlet="template; context: getEmptyWarningContext()"></ng-container>
     </ng-container>
   </ng-container>
 
   <ng-template #defaultEmptyWarning>
-    <p [ngClass]="getClassNames('emptyWarning')" *ngIf="local.invalid">
+    <p [ngClass]="getClassNames('emptyWarning')" *ngIf="local.invalidEmpty">
       {{emptyMessage}}
     </p>
   </ng-template>
