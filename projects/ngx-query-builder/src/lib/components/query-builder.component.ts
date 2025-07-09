@@ -958,6 +958,25 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return rule.rules && rule.rules.length === 0;
   }
 
+  isRuleInvalid(rule: Rule, parent: RuleSet = this.data): boolean {
+    const field = this.config.fields[rule.field];
+    if (field && field.validator) {
+      return field.validator(rule, parent) != null;
+    } else if (field && field.type === 'textarea') {
+      const requiresValue = rule.operator !== 'is null' && rule.operator !== 'is not null';
+      return requiresValue && (typeof rule.value !== 'string' || rule.value.trim() === '');
+    }
+    return false;
+  }
+
+  isRulesetInvalid(ruleset: RuleSet): boolean {
+    if (!ruleset || !ruleset.rules) { return false; }
+    if (!this.config.allowEmptyRulesets && this.isEmptyRuleset(ruleset)) {
+      return true;
+    }
+    return ruleset.rules.some((r) => this.isRuleset(r) ? this.isRulesetInvalid(r) : this.isRuleInvalid(r as Rule, ruleset));
+  }
+
   private calculateFieldChangeValue(
     currentField: Field | undefined,
     nextField: Field | undefined,
