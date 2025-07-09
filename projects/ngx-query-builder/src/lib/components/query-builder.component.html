@@ -98,20 +98,26 @@
   <ng-template #defaultSwitchGroup>
     <div [ngClass]="getClassNames('switchGroup', 'transition')" *ngIf="data"
          (mouseenter)="hoveringSwitchGroup = true" (mouseleave)="hoveringSwitchGroup = false">
-      <div [ngClass]="getClassNames('switchControl')" *ngIf="allowNot && (!hideButtons || hoveringSwitchGroup || data.not)">
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="allowNot && (hoveringSwitchGroup || data.not || data.rules.length === 1)">
         <input type="checkbox" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.not"
                (ngModelChange)="changeNot($event)" [disabled]="disabled" />
-        <label (click)="changeNot(!data.not)" [ngClass]="getClassNames('switchLabel')">NOT</label>
+        <label (click)="changeNot(!data.not)" [ngClass]="getClassNames('switchLabel')">
+          <ng-container *ngIf="data.rules.length !== 1">NOT</ng-container>
+        </label>
       </div>
-      <div [ngClass]="getClassNames('switchControl')" *ngIf="!hideButtons || hoveringSwitchGroup || data.condition === 'and'">
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="hoveringSwitchGroup || data.condition === 'and' || data.rules.length === 1">
         <input type="radio" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.condition" [disabled]=disabled
                value="and" #andOption />
-        <label (click)="changeCondition(andOption.value)" [ngClass]="getClassNames('switchLabel')">AND</label>
+        <label (click)="changeCondition(andOption.value)" [ngClass]="getClassNames('switchLabel')">
+          <ng-container *ngIf="data.rules.length !== 1">AND</ng-container>
+        </label>
       </div>
-      <div [ngClass]="getClassNames('switchControl')" *ngIf="!hideButtons || hoveringSwitchGroup || data.condition === 'or'">
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="hoveringSwitchGroup || data.condition === 'or' || data.rules.length === 1">
         <input type="radio" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.condition" [disabled]=disabled
                value="or" #orOption />
-        <label (click)="changeCondition(orOption.value)" [ngClass]="getClassNames('switchLabel')">OR</label>
+        <label (click)="changeCondition(orOption.value)" [ngClass]="getClassNames('switchLabel')">
+          <ng-container *ngIf="data.rules.length !== 1">OR</ng-container>
+        </label>
       </div>
       <span *ngIf="collapsed && config.customCollapsedSummary" [ngClass]="getClassNames('collapsedSummary')">
         {{ config.customCollapsedSummary(data) }}
