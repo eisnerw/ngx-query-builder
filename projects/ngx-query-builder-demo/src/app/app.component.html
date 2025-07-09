@@ -36,6 +36,9 @@
           <label><input type="checkbox" [(ngModel)]='allowConvertToRuleset'>Allow Convert To Ruleset</label>
         </div>
         <div>
+          <label><input type="checkbox" [(ngModel)]='useSavedRulesets' (change)='updateNamedRulesetsUsage()'>Saved Rulesets</label>
+        </div>
+        <div>
           <label><input type="checkbox" [(ngModel)]='allowRuleUpDown'>Allow Rule Up/Down</label>
         </div>
         <div>
