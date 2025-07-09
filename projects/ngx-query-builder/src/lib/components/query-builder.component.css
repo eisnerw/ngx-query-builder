@@ -334,6 +334,13 @@
   .q-name-input {
     font-size: 0.75em;
     padding: 2px 4px;
+    border: 1px solid #bbb;
+  }
+
+  .q-name-edit .q-button {
+    border: none;
+    padding: 0 4px;
+    font-size: 0.75em;
   }
 
   .q-name-action {

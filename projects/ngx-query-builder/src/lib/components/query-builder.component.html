@@ -8,7 +8,7 @@
       <ng-template [ngTemplateOutlet]="_switchGroupTpl"/>
 
       <span *ngIf="namingRuleset === data" class="q-name-edit">
-        <input [(ngModel)]="namingRulesetName" class="q-name-input" />
+        <input [(ngModel)]="namingRulesetName" class="q-name-input" (input)="onNamingInput($event)" />
         <button type="button" (click)="confirmNamingRuleset()" [ngClass]="getClassNames('button')">✓</button>
         <button type="button" (click)="cancelNamingRuleset()" [ngClass]="getClassNames('button')">✕</button>
       </span>

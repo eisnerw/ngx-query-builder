@@ -1216,6 +1216,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
   }
 
+  private cloneRuleset(ruleset: RuleSet): RuleSet {
+    return JSON.parse(JSON.stringify(ruleset));
+  }
+
   private getAncestorNames(ruleset: RuleSet | null): string[] {
     const names: string[] = [];
     let current = ruleset;
@@ -1256,7 +1260,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       data: { names, rulesetName: this.rulesetName }
     }).afterClosed().subscribe((selection: string | null) => {
       if (selection && names.includes(selection)) {
-        const rs = JSON.parse(JSON.stringify(this.config.getNamedRuleset!(selection)));
+        const rs = this.cloneRuleset(this.config.getNamedRuleset!(selection));
         this.registerParentRefs(rs, target);
         target.rules.push(rs);
         this.handleTouched();
@@ -1305,7 +1309,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         this.config.deleteNamedRuleset!(ruleset.name!);
         ruleset.name = newName;
       }
-      this.config.saveNamedRuleset!(ruleset);
+      this.config.saveNamedRuleset!(this.cloneRuleset(ruleset));
       this.handleTouched();
       this.handleDataChange();
     });
@@ -1330,11 +1334,16 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     ruleset.name = name;
     this.registerParentRefs(ruleset, QueryBuilderComponent.parentMap.get(ruleset) || null);
     if (this.config.saveNamedRuleset) {
-      this.config.saveNamedRuleset(ruleset);
+      this.config.saveNamedRuleset(this.cloneRuleset(ruleset));
     }
     this.namingRuleset = null;
     this.handleTouched();
     this.handleDataChange();
+  }
+
+  onNamingInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.namingRulesetName = input.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
   }
 
   cancelNamingRuleset(): void {
