@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
     condition: 'and',
     rules: [
       {field: 'age', operator: '<='},
-      {field: 'birthday', operator: '=', value: new Date()},
+      {field: 'birthday', operator: '=', value: (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })()},
       {
         condition: 'or',
         rules: [
@@ -78,7 +78,7 @@ export class AppComponent implements OnInit {
       notes: {name: 'Notes', type: 'textarea', operators: ['=', '!='], entity: 'nonphysical'},
       educated: {name: 'College Degree?', type: 'boolean', entity: 'nonphysical'},
       birthday: {name: 'Birthday', type: 'date', operators: ['=', '<=', '>'],
-        defaultValue: (() => new Date()), entity: 'nonphysical'
+        defaultValue: (() => { const d = new Date(); d.setHours(0,0,0,0); return d; }), entity: 'nonphysical'
       },
       school: {name: 'School', type: 'string', nullable: true, entity: 'nonphysical'},
       occupation: {
@@ -110,7 +110,7 @@ export class AppComponent implements OnInit {
       notes: {name: 'Notes', type: 'textarea', operators: ['=', '!=']},
       educated: {name: 'College Degree?', type: 'boolean'},
       birthday: {name: 'Birthday', type: 'date', operators: ['=', '<=', '>'],
-        defaultValue: (() => new Date())
+        defaultValue: (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })
       },
       school: {name: 'School', type: 'string', nullable: true},
       occupation: {

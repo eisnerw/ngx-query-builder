@@ -1035,7 +1035,11 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         return typeof val !== 'string' || !/^\d{2}:\d{2}(:\d{2})?$/.test(val);
       case 'date':
         if (val instanceof Date) {
-          return isNaN(val.getTime());
+          if (isNaN(val.getTime())) {
+            return true;
+          }
+          return val.getHours() !== 0 || val.getMinutes() !== 0
+            || val.getSeconds() !== 0 || val.getMilliseconds() !== 0;
         } else if (typeof val === 'string') {
           return !/^\d{4}-\d{2}-\d{2}$/.test(val) || isNaN(Date.parse(val));
         }

@@ -106,14 +106,14 @@ export class AppComponent {
 query = {
   condition: 'and',
   rules: [
-    {field: 'birthday', operator: '=', value: new Date()}
+    {field: 'birthday', operator: '=', value: (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })()}
   ]
 };
 
 config: QueryBuilderConfig = {
   fields: {
     birthday: {name: 'Birthday', type: 'date', operators: ['=', '<=', '>']
-      defaultValue: (() => return new Date())
+      defaultValue: (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })
     },
   }
 }
