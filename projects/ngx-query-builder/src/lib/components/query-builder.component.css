@@ -323,4 +323,20 @@
     align-self: center;
     margin-right: 8px;
   }
+
+  .q-name-edit {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-left: 8px;
+  }
+
+  .q-name-input {
+    font-size: 0.75em;
+    padding: 2px 4px;
+  }
+
+  .q-name-action {
+    margin-left: 8px;
+  }
 }

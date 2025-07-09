@@ -1,7 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
-import { FormsModule, } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { QueryBuilderComponent } from './query-builder.component';
+import { AddNamedRulesetDialogComponent } from './add-named-ruleset-dialog.component';
+import { NamedRulesetDialogComponent } from './named-ruleset-dialog.component';
+import { MessageDialogComponent } from './message-dialog.component';
 
 describe('QueryBuilderComponent', () => {
   let component: QueryBuilderComponent;
@@ -9,8 +14,13 @@ describe('QueryBuilderComponent', () => {
 
   beforeEach((() => {
     TestBed.configureTestingModule({
-      imports: [ CommonModule, FormsModule ],
-      declarations: [ QueryBuilderComponent ]
+      imports: [ CommonModule, FormsModule, MatDialogModule, BrowserAnimationsModule ],
+      declarations: [
+        QueryBuilderComponent,
+        AddNamedRulesetDialogComponent,
+        NamedRulesetDialogComponent,
+        MessageDialogComponent
+      ]
     })
     .compileComponents();
   }));
