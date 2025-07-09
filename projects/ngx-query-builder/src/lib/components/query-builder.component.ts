@@ -1302,10 +1302,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         return;
       }
       if (ruleset.name !== newName) {
-        this.config.deleteNamedRuleset(ruleset.name!);
+        this.config.deleteNamedRuleset!(ruleset.name!);
         ruleset.name = newName;
       }
-      this.config.saveNamedRuleset(ruleset);
+      this.config.saveNamedRuleset!(ruleset);
       this.handleTouched();
       this.handleDataChange();
     });

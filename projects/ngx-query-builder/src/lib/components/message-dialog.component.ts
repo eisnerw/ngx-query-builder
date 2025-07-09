@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'lib-message-dialog',
+  standalone: false,
   template: `
     <h1 mat-dialog-title>{{data.title}}</h1>
     <div mat-dialog-content>{{data.message}}</div>
