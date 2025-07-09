@@ -562,18 +562,25 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
 
     parent = parent || this.data;
+    let newRuleset: RuleSet | undefined;
     if (this.config.addRuleSet) {
       this.config.addRuleSet(parent);
+      const last = parent.rules[parent.rules.length - 1];
+      if (this.isRuleset(last)) {
+        newRuleset = last as RuleSet;
+      }
     } else {
       const rs: RuleSet = { condition: 'and', rules: [] };
       if (this.allowNot) {
         rs.not = false;
       }
       parent.rules = parent.rules.concat([rs]);
+      newRuleset = rs;
     }
 
-    this.handleTouched();
-    this.handleDataChange();
+    if (newRuleset) {
+      this.addRule(newRuleset);
+    }
   }
 
   removeRuleSet(ruleset?: RuleSet, parent?: RuleSet): void {
