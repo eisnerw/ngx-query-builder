@@ -14,6 +14,8 @@ export class AppComponent implements OnInit {
   public queryTextState: 'valid' | 'invalid-json' | 'invalid-query' = 'valid';
   public queryTitle = '';
 
+  public namedRulesets: Record<string, RuleSet> = {};
+
   public bootstrapClassNames: QueryBuilderClassNames = {
     removeIcon: 'fa fa-minus',
     addIcon: 'fa fa-plus',
@@ -220,6 +222,24 @@ export class AppComponent implements OnInit {
     return null;
   }
 
+  listNamedRulesets(): string[] {
+    return Object.keys(this.namedRulesets);
+  }
+
+  getNamedRuleset(name: string): RuleSet {
+    return JSON.parse(JSON.stringify(this.namedRulesets[name]));
+  }
+
+  saveNamedRuleset(ruleset: RuleSet) {
+    if (ruleset.name) {
+      this.namedRulesets[ruleset.name] = JSON.parse(JSON.stringify(ruleset));
+    }
+  }
+
+  deleteNamedRuleset(name: string) {
+    delete this.namedRulesets[name];
+  }
+
   updateCollapsedSummary() {
     this.currentConfig = {
       ...this.currentConfig,
@@ -231,6 +251,13 @@ export class AppComponent implements OnInit {
     private formBuilder: FormBuilder
   ) {
     this.queryCtrl = this.formBuilder.control(this.query);
+    this.config = {
+      ...this.config,
+      listNamedRulesets: this.listNamedRulesets.bind(this),
+      getNamedRuleset: this.getNamedRuleset.bind(this),
+      saveNamedRuleset: this.saveNamedRuleset.bind(this),
+      deleteNamedRuleset: this.deleteNamedRuleset.bind(this)
+    } as QueryBuilderConfig;
     this.currentConfig = this.config;
     this.updateCollapsedSummary();
     this.queryText = JSON.stringify(this.queryCtrl.value, null, 2);
