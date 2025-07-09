@@ -113,6 +113,9 @@
                value="or" #orOption />
         <label (click)="changeCondition(orOption.value)" [ngClass]="getClassNames('switchLabel')">OR</label>
       </div>
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="data.rules.length === 1 && (!hideButtons || hoveringSwitchGroup)">
+        <label [ngClass]="getClassNames('switchLabel')">&nbsp;</label>
+      </div>
       <span *ngIf="collapsed && config.customCollapsedSummary" [ngClass]="getClassNames('collapsedSummary')">
         {{ config.customCollapsedSummary(data) }}
       </span>

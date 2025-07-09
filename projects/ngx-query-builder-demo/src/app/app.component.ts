@@ -146,6 +146,7 @@ export class AppComponent implements OnInit {
   public allowRuleUpDown: boolean = false;
   public hideButtons: boolean = false;
   public persistValueOnFieldChange: boolean = false;
+  public defaultAttribute: string = 'name';
   public useCollapsedSummary: boolean = false;
   public ruleName: string = 'Rule';
   public rulesetName: string = 'Ruleset';

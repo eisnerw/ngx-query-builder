@@ -155,6 +155,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   @Input() parentChangeCallback!: () => void;
   @Input() parentTouchedCallback!: () => void;
   @Input() persistValueOnFieldChange = false;
+  @Input() defaultAttribute = '';
 
   @ViewChild('treeContainer', {static: true}) treeContainer!: ElementRef;
   public collapsed = false;
@@ -443,14 +444,19 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     if (this.config.addRule) {
       this.config.addRule(parent);
     } else {
-      const field = this.fields[0];
-      if (field.value) {
-        parent.rules = parent.rules.concat([{
-          field: field.value,
-          operator: this.getDefaultOperator(field) || '',
-          value: this.getDefaultValue(field.defaultValue),
-          entity: field.entity
-        } as Rule] as Rule[]);
+      let field = this.fields.find(f => f.value === this.defaultAttribute);
+      if (!field) {
+        field = this.fields[0];
+      }
+      if (field && field.value) {
+        parent.rules = parent.rules.concat([
+          {
+            field: field.value,
+            operator: this.getDefaultOperator(field) || '',
+            value: this.getDefaultValue(field.defaultValue),
+            entity: field.entity
+          } as Rule
+        ] as Rule[]);
       }
     }
 
@@ -564,12 +570,17 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     parent = parent || this.data;
     if (this.config.addRuleSet) {
       this.config.addRuleSet(parent);
+      const maybeRs = parent.rules[parent.rules.length - 1];
+      if (maybeRs && this.isRuleset(maybeRs) && maybeRs.rules.length === 0) {
+        this.addRule(maybeRs);
+      }
     } else {
       const rs: RuleSet = { condition: 'and', rules: [] };
       if (this.allowNot) {
         rs.not = false;
       }
       parent.rules = parent.rules.concat([rs]);
+      this.addRule(rs);
     }
 
     this.handleTouched();
