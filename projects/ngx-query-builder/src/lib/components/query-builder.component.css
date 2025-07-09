@@ -139,6 +139,8 @@
 
   .q-switch-label-empty {
     visibility: hidden;
+    display: inline-block;
+    width: 12px;
   }
 
   .q-switch-radio {
