@@ -356,16 +356,7 @@ export class AppComponent implements OnInit {
           }
           break;
         case 'date':
-          if (val instanceof Date) {
-            if (
-              val.getHours() !== 0 ||
-              val.getMinutes() !== 0 ||
-              val.getSeconds() !== 0 ||
-              val.getMilliseconds() !== 0
-            ) {
-              return false;
-            }
-          } else if (typeof val === 'string') {
+          if (typeof val === 'string') {
             if (!/^\d{4}-\d{2}-\d{2}$/.test(val) || isNaN(Date.parse(val))) {
               return false;
             }
