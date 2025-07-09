@@ -50,6 +50,10 @@ import {
   ViewChild,
   ElementRef
 } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { AddNamedRulesetDialogComponent } from './add-named-ruleset-dialog.component';
+import { NamedRulesetDialogComponent, NamedRulesetDialogResult } from './named-ruleset-dialog.component';
+import { MessageDialogComponent } from './message-dialog.component';
 
 export const CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -191,8 +195,11 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   private rulesetRemoveButtonContextCache = new Map<Rule, RulesetRemoveButtonContext>();
   private ruleRemoveButtonContextCache = new Map<Rule, RuleRemoveButtonContext>();
   private buttonGroupContext!: ButtonGroupContext;
+  public namingRuleset: RuleSet | null = null;
+  public namingRulesetName = '';
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor(private changeDetectorRef: ChangeDetectorRef,
+              private dialog: MatDialog) { }
 
   // ----------OnChanges Implementation----------
 
@@ -1236,21 +1243,26 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     if (this.disabled || !this.config.listNamedRulesets || !this.config.getNamedRuleset) {
       return;
     }
-    parent = parent || this.data;
-    const excluded = this.getAncestorNames(parent);
+    const target = parent || this.data;
+    const excluded = this.getAncestorNames(target);
     const names = this.config.listNamedRulesets().filter(n => excluded.indexOf(n) === -1);
     if (names.length === 0) {
-      window.alert('No saved ' + this.rulesetName + 's available.');
+      this.dialog.open(MessageDialogComponent, {
+        data: { title: 'Named ' + this.rulesetName, message: 'No saved ' + this.rulesetName + 's available.' }
+      });
       return;
     }
-    const selection = window.prompt('Select a Named ' + this.rulesetName + '\n' + names.join('\n'));
-    if (selection && names.includes(selection)) {
-      const rs = JSON.parse(JSON.stringify(this.config.getNamedRuleset!(selection)));
-      this.registerParentRefs(rs, parent);
-      parent.rules.push(rs);
-      this.handleTouched();
-      this.handleDataChange();
-    }
+    this.dialog.open(AddNamedRulesetDialogComponent, {
+      data: { names, rulesetName: this.rulesetName }
+    }).afterClosed().subscribe((selection: string | null) => {
+      if (selection && names.includes(selection)) {
+        const rs = JSON.parse(JSON.stringify(this.config.getNamedRuleset!(selection)));
+        this.registerParentRefs(rs, target);
+        target.rules.push(rs);
+        this.handleTouched();
+        this.handleDataChange();
+      }
+    });
   }
 
   namedRulesetModified(ruleset: RuleSet): boolean {
@@ -1267,47 +1279,66 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       return;
     }
     const modified = this.namedRulesetModified(ruleset);
-    let msg = 'Rename or delete ' + this.rulesetName + ' "' + ruleset.name + '"';
-    if (modified) { msg += '\nType UPDATE to overwrite existing definition.'; }
-    const result = window.prompt(msg, ruleset.name);
-    if (result === null) { return; }
-    if (result === '') {
-      if (confirm('Delete named ' + this.rulesetName + ' ' + ruleset.name + '?')) {
-        this.config.deleteNamedRuleset(ruleset.name);
-        delete ruleset.name;
-        this.handleTouched();
-        this.handleDataChange();
+    this.dialog.open(NamedRulesetDialogComponent, {
+      data: { name: ruleset.name!, rulesetName: this.rulesetName, allowDelete: true, modified }
+    }).afterClosed().subscribe((result: NamedRulesetDialogResult | undefined) => {
+      if (!result || result.action === 'cancel') { return; }
+      if (result.action === 'delete') {
+        this.dialog.open(MessageDialogComponent, {
+          data: { title: 'Confirm', message: 'Delete named ' + this.rulesetName + ' ' + ruleset.name + '?', confirm: true }
+        }).afterClosed().subscribe((confirmed: boolean) => {
+          if (confirmed) {
+            this.config.deleteNamedRuleset!(ruleset.name!);
+            delete ruleset.name;
+            this.handleTouched();
+            this.handleDataChange();
+          }
+        });
+        return;
       }
+      const newName = result.name!.trim();
+      if (!this.isValidRulesetName(newName, ruleset)) {
+        this.dialog.open(MessageDialogComponent, { data: { title: 'Invalid name', message: 'Invalid name' } });
+        return;
+      }
+      if (ruleset.name !== newName) {
+        this.config.deleteNamedRuleset!(ruleset.name!);
+        ruleset.name = newName;
+      }
+      this.config.saveNamedRuleset!(ruleset);
+      this.handleTouched();
+      this.handleDataChange();
+    });
+  }
+
+  startNamingRuleset(ruleset: RuleSet = this.data): void {
+    if (!this.config.saveNamedRuleset) { return; }
+    this.namingRuleset = ruleset;
+    this.namingRulesetName = '';
+  }
+
+  confirmNamingRuleset(): void {
+    const ruleset = this.namingRuleset;
+    if (!ruleset) { return; }
+    const name = this.namingRulesetName.trim();
+    if (!this.isValidRulesetName(name)) {
+      this.dialog.open(MessageDialogComponent, {
+        data: { title: 'Invalid name', message: 'Invalid name' }
+      });
       return;
     }
-    if (modified && result === 'UPDATE') {
+    ruleset.name = name;
+    this.registerParentRefs(ruleset, QueryBuilderComponent.parentMap.get(ruleset) || null);
+    if (this.config.saveNamedRuleset) {
       this.config.saveNamedRuleset(ruleset);
-      return;
     }
-    const newName = result.trim();
-    if (!this.isValidRulesetName(newName, ruleset)) {
-      alert('Invalid name');
-      return;
-    }
-    if (ruleset.name !== newName) {
-      this.config.deleteNamedRuleset(ruleset.name);
-      ruleset.name = newName;
-    }
-    this.config.saveNamedRuleset(ruleset);
+    this.namingRuleset = null;
     this.handleTouched();
     this.handleDataChange();
   }
 
-  nameRuleset(ruleset: RuleSet = this.data): void {
-    if (!this.config.saveNamedRuleset) { return; }
-    const name = window.prompt('Enter name for ' + this.rulesetName);
-    if (!name) { return; }
-    if (!this.isValidRulesetName(name)) { alert('Invalid name'); return; }
-    ruleset.name = name;
-    this.registerParentRefs(ruleset, QueryBuilderComponent.parentMap.get(ruleset) || null);
-    this.config.saveNamedRuleset(ruleset);
-    this.handleTouched();
-    this.handleDataChange();
+  cancelNamingRuleset(): void {
+    this.namingRuleset = null;
   }
 
 }

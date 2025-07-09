@@ -5,9 +5,18 @@
         <ng-template [ngTemplateOutlet]="_arrowIconTpl"/>
       </a>
 
-      <span *ngIf="!data.name && config.saveNamedRuleset && !isRulesetInvalid(data)" class="q-name-text" (click)="nameRuleset(data)">Click to name {{rulesetName}}</span>
-
       <ng-template [ngTemplateOutlet]="_switchGroupTpl"/>
+
+      <span *ngIf="namingRuleset === data" class="q-name-edit">
+        <input [(ngModel)]="namingRulesetName" class="q-name-input" />
+        <button type="button" (click)="confirmNamingRuleset()" [ngClass]="getClassNames('button')">✓</button>
+        <button type="button" (click)="cancelNamingRuleset()" [ngClass]="getClassNames('button')">✕</button>
+      </span>
+      <span *ngIf="!data.name && config.saveNamedRuleset && !isRulesetInvalid(data) && namingRuleset !== data" class="q-name-text" (click)="startNamingRuleset(data)">Click to name {{rulesetName}}</span>
+
+      <button *ngIf="data.name && config.getNamedRuleset && config.saveNamedRuleset && config.deleteNamedRuleset" type="button" class="q-name-action" (click)="namedRulesetAction(data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
+        <i [ngClass]="getClassNames(namedRulesetModified(data) ? 'saveIcon' : 'searchIcon')"></i>
+      </button>
 
       <ng-template [ngTemplateOutlet]="_buttonGroupTpl"/>
     </div>
@@ -172,10 +181,6 @@
           <path d="M1 3h10v2H1zM1 7h10v2H1z"/>
         </svg>
         {{ruleName}}
-      </button>
-      <button *ngIf="data.name && config.getNamedRuleset && config.saveNamedRuleset && config.deleteNamedRuleset" type="button"
-              (click)="namedRulesetAction(data)" [ngClass]="getClassNames('button')" [disabled]="disabled">
-        <i [ngClass]="getClassNames(namedRulesetModified(data) ? 'saveIcon' : 'searchIcon')"></i> {{rulesetName}}: {{data.name}}
       </button>
       <ng-container *ngIf="!!parentValue">
         <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
