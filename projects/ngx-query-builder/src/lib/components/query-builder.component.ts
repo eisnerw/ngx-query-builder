@@ -1228,6 +1228,29 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return names;
   }
 
+  private containsName(ruleset: RuleSet | null, name: string): boolean {
+    if (!ruleset) { return false; }
+    if (ruleset.name === name) { return true; }
+    return (ruleset.rules || []).some(r => this.isRuleset(r) && this.containsName(r, name));
+  }
+
+  private updateNamedRulesetInstances(oldName: string, source: RuleSet, newName?: string): void {
+    const visit = (rs: RuleSet) => {
+      (rs.rules || []).forEach((r, idx) => {
+        if (this.isRuleset(r)) {
+          visit(r);
+          if (r !== source && r.name === oldName) {
+            const copy = JSON.parse(JSON.stringify(source));
+            copy.name = newName ?? oldName;
+            rs.rules[idx] = copy;
+            this.registerParentRefs(copy, rs);
+          }
+        }
+      });
+    };
+    visit(this.data);
+  }
+
   private isValidRulesetName(name: string, current?: RuleSet): boolean {
     if (!/^[A-Z0-9_]+$/.test(name) || !/[A-Z]/.test(name)) {
       return false;
@@ -1301,11 +1324,18 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         this.dialog.open(MessageDialogComponent, { data: { title: 'Invalid name', message: 'Invalid name' } });
         return;
       }
-      if (ruleset.name !== newName) {
-        this.config.deleteNamedRuleset!(ruleset.name!);
+      const ancestors = this.getAncestorNames(QueryBuilderComponent.parentMap.get(ruleset) || null);
+      if (ancestors.includes(newName) || this.containsName(ruleset, newName)) {
+        this.dialog.open(MessageDialogComponent, { data: { title: 'Invalid name', message: 'Circular reference' } });
+        return;
+      }
+      const oldName = ruleset.name!;
+      if (oldName !== newName) {
+        this.config.deleteNamedRuleset!(oldName);
         ruleset.name = newName;
       }
       this.config.saveNamedRuleset!(ruleset);
+      this.updateNamedRulesetInstances(oldName, ruleset, newName);
       this.handleTouched();
       this.handleDataChange();
     });
@@ -1324,6 +1354,13 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     if (!this.isValidRulesetName(name)) {
       this.dialog.open(MessageDialogComponent, {
         data: { title: 'Invalid name', message: 'Invalid name' }
+      });
+      return;
+    }
+    const ancestors = this.getAncestorNames(QueryBuilderComponent.parentMap.get(ruleset) || null);
+    if (ancestors.includes(name) || this.containsName(ruleset, name)) {
+      this.dialog.open(MessageDialogComponent, {
+        data: { title: 'Invalid name', message: 'Circular reference' }
       });
       return;
     }
