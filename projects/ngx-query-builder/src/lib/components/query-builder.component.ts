@@ -1239,6 +1239,26 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return existing.indexOf(name) === -1;
   }
 
+  private updateNamedRulesetInstances(name: string): void {
+    if (!this.config.getNamedRuleset) { return; }
+    const saved = this.config.getNamedRuleset(name);
+    if (!saved) { return; }
+    const traverse = (rs: RuleSet) => {
+      if (rs.name === name) {
+        const copy = JSON.parse(JSON.stringify(saved));
+        const parent = QueryBuilderComponent.parentMap.get(rs) || null;
+        Object.assign(rs, copy);
+        this.registerParentRefs(rs, parent);
+      }
+      if (rs.rules) {
+        rs.rules.forEach(r => {
+          if (this.isRuleset(r)) { traverse(r); }
+        });
+      }
+    };
+    traverse(this.data);
+  }
+
   addNamedRuleSet(parent?: RuleSet): void {
     if (this.disabled || !this.config.listNamedRulesets || !this.config.getNamedRuleset) {
       return;
@@ -1306,6 +1326,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         ruleset.name = newName;
       }
       this.config.saveNamedRuleset!(ruleset);
+      this.updateNamedRulesetInstances(ruleset.name!);
       this.handleTouched();
       this.handleDataChange();
     });
