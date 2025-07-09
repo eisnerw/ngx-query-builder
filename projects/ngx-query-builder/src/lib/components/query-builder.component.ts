@@ -132,6 +132,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   @Input() allowConvertToRuleset = false;
   @Input() allowCollapse = true;
   @Input() allowRuleUpDown = false;
+  @Input() hideButtons = false;
   @Input() emptyMessage = 'A ruleset cannot be empty. Please add a rule or remove it all together.';
   @Input() ruleName = 'Rule';
   @Input() rulesetName = 'Ruleset';

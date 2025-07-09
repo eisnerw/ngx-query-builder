@@ -29,7 +29,9 @@
                     <ng-template [ngTemplateOutlet]="_inputTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
                   </div>
 
-                  <div [ngClass]="getClassNames('ruleActions')">
+                  <div [ngClass]="getClassNames('ruleActions')" class="q-button-wrapper" [class.q-hide-buttons]="hideButtons">
+                    <span *ngIf="hideButtons" class="q-ellipsis">&hellip;</span>
+                    <div class="q-buttons">
                     <button *ngIf="allowRuleUpDown && data.rules.length > 1" type="button" (click)="moveRuleUp(rule, data)"
                             [ngClass]="getClassNames('button')"
                             [disabled]="disabled || i === 0">
@@ -47,6 +49,7 @@
                       {{rulesetName}}
                     </button>
                     <ng-template [ngTemplateOutlet]="_ruleRemoveButtonTpl" [ngTemplateOutletContext]="{ $implicit: rule }"/>
+                    </div>
                   </div>
                 </div>
               </ng-container>
@@ -64,6 +67,7 @@
                                  [parentValue]="data" [classNames]="classNames" [config]="config" [allowRuleset]="allowRuleset"
                                  [allowCollapse]="allowCollapse" [allowNot]="allowNot" [allowConvertToRuleset]="allowConvertToRuleset"
                                  [allowRuleUpDown]="allowRuleUpDown" [ruleName]="ruleName" [rulesetName]="rulesetName"
+                                 [hideButtons]="hideButtons"
                                  [emptyMessage]="emptyMessage" [operatorMap]="operatorMap">
               </ngx-query-builder>
             </li>
@@ -94,17 +98,17 @@
   <ng-template #defaultSwitchGroup>
     <div [ngClass]="getClassNames('switchGroup', 'transition')" *ngIf="data"
          (mouseenter)="hoveringSwitchGroup = true" (mouseleave)="hoveringSwitchGroup = false">
-      <div [ngClass]="getClassNames('switchControl')" *ngIf="allowNot && (hoveringSwitchGroup || data.not)">
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="allowNot && (!hideButtons || hoveringSwitchGroup || data.not)">
         <input type="checkbox" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.not"
                (ngModelChange)="changeNot($event)" [disabled]="disabled" />
         <label (click)="changeNot(!data.not)" [ngClass]="getClassNames('switchLabel')">NOT</label>
       </div>
-      <div [ngClass]="getClassNames('switchControl')" *ngIf="hoveringSwitchGroup || data.condition === 'and'">
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="!hideButtons || hoveringSwitchGroup || data.condition === 'and'">
         <input type="radio" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.condition" [disabled]=disabled
                value="and" #andOption />
         <label (click)="changeCondition(andOption.value)" [ngClass]="getClassNames('switchLabel')">AND</label>
       </div>
-      <div [ngClass]="getClassNames('switchControl')" *ngIf="hoveringSwitchGroup || data.condition === 'or'">
+      <div [ngClass]="getClassNames('switchControl')" *ngIf="!hideButtons || hoveringSwitchGroup || data.condition === 'or'">
         <input type="radio" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.condition" [disabled]=disabled
                value="or" #orOption />
         <label (click)="changeCondition(orOption.value)" [ngClass]="getClassNames('switchLabel')">OR</label>
@@ -125,7 +129,9 @@
   </ng-container>
 
   <ng-template #defaultButtonGroup>
-    <div [ngClass]="getClassNames('buttonGroup', 'rightAlign')">
+    <div [ngClass]="getClassNames('buttonGroup', 'rightAlign')" class="q-button-wrapper" [class.q-hide-buttons]="hideButtons">
+      <span *ngIf="hideButtons" class="q-ellipsis">&hellip;</span>
+      <div class="q-buttons">
       <ng-container *ngIf="!config.rulesLimit || data.rules.length < config.rulesLimit">
         <ng-container *ngTemplateOutlet="_rulesetAddRuleButtonTpl"></ng-container>
         <ng-container *ngIf="!config.levelLimit || level + 1 < config.levelLimit">
@@ -149,9 +155,10 @@
         </svg>
         {{ruleName}}
       </button>
-      <ng-container *ngIf="!!parentValue">
-        <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
-      </ng-container>
+        <ng-container *ngIf="!!parentValue">
+          <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>
+        </ng-container>
+      </div>
     </div>
   </ng-template>
 </ng-template>
