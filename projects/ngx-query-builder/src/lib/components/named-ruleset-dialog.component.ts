@@ -10,7 +10,7 @@ export interface NamedRulesetDialogData {
 }
 
 export interface NamedRulesetDialogResult {
-  action: 'save' | 'delete' | 'cancel' | 'removeName';
+  action: 'save' | 'delete' | 'cancel' | 'removeName' | 'undo';
   name?: string;
 }
 
@@ -25,13 +25,20 @@ export interface NamedRulesetDialogResult {
         <input matInput [(ngModel)]="name" (input)="onInput($event)" />
         <button mat-icon-button matSuffix *ngIf="name" (click)="name = ''" type="button">✕</button>
       </mat-form-field>
+      <div *ngIf="name.trim() === ''" class="q-modified-warning">
+        The name will be removed from the {{data.rulesetName}}
+      </div>
+      <div *ngIf="name.trim() !== '' && name.trim() !== data.name" class="q-modified-warning">
+        All instances of {{data.name}} will be renamed to {{name.trim()}}
+      </div>
       <div *ngIf="data.modified" class="q-modified-warning">
-        {{ name.trim() === '' ? 'The name will be removed from the ' + data.rulesetName : 'Existing definition will be updated.' }}
+        Existing definition will be updated.
       </div>
     </div>
     <div mat-dialog-actions>
       <button mat-button (click)="dialogRef.close({action: 'cancel'})">Cancel</button>
-      <button mat-raised-button color="primary" (click)="dialogRef.close({action: 'save', name})">Update</button>
+      <button mat-button *ngIf="data.modified" (click)="dialogRef.close({action: 'undo'})">Undo</button>
+      <button mat-raised-button color="primary" [disabled]="isUpdateDisabled()" (click)="dialogRef.close({action: 'save', name})">Update</button>
     </div>
   `
 })
@@ -49,5 +56,9 @@ export class NamedRulesetDialogComponent {
     const sanitizer = this.data.rulesetNameSanitizer ||
       ((v: string) => v.toUpperCase().replace(/ /g, '_').replace(/[^A-Z0-9_]/g, ''));
     this.name = sanitizer(input.value);
+  }
+
+  isUpdateDisabled(): boolean {
+    return !this.data.modified && this.name.trim() === this.data.name;
   }
 }

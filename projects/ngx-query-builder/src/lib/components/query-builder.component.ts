@@ -1447,6 +1447,22 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       }
     }).afterClosed().subscribe((result: NamedRulesetDialogResult | undefined) => {
       if (!result || result.action === 'cancel') { return; }
+      if (result.action === 'undo') {
+        try {
+          const stored = this.config.getNamedRuleset!(ruleset.name!);
+          if (stored) {
+            const clone = this.cloneRuleset(stored);
+            Object.keys(ruleset).forEach(k => delete (ruleset as any)[k]);
+            Object.assign(ruleset, clone);
+            this.registerParentRefs(ruleset, QueryBuilderComponent.parentMap.get(ruleset) || null);
+          }
+        } catch {
+          // ignore errors restoring from store
+        }
+        this.handleTouched();
+        this.handleDataChange();
+        return;
+      }
       if (result.action === 'removeName' || !result.name || result.name.trim() === '') {
         const name = ruleset.name as string;
         delete ruleset.name;
