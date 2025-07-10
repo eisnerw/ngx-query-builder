@@ -113,6 +113,7 @@ export interface QueryBuilderConfig {
   getNamedRuleset?: (name: string) => RuleSet;
   saveNamedRuleset?: (ruleset: RuleSet) => void;
   deleteNamedRuleset?: (name: string) => void;
+  rulesetNameSanitizer?: (value: string) => string;
 }
 
 export interface SwitchGroupContext {
