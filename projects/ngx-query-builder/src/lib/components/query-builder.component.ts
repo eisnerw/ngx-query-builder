@@ -1420,8 +1420,8 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         return;
       }
       const oldName = ruleset.name!;
+      const root = this.getRootRuleset(ruleset);
       if (oldName !== newName) {
-        const root = this.getRootRuleset(ruleset);
         if (this.renameCreatesCycle(oldName, newName, root)) {
           this.dialog.open(MessageDialogComponent, { data: { title: 'Invalid name', message: 'Invalid name' } });
           return;
