@@ -1322,6 +1322,23 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return cycle;
   }
 
+  private saveNamedRulesetDefinition(ruleset: RuleSet, oldName?: string): void {
+    if (!ruleset.name || !this.config.saveNamedRuleset) { return; }
+    const root = this.getRootRuleset(ruleset);
+    if (oldName && oldName !== ruleset.name) {
+      if (this.renameCreatesCycle(oldName, ruleset.name, root)) { return; }
+      this.renameNamedRulesetInstances(oldName, ruleset.name, ruleset, ruleset, root);
+      if (this.config.deleteNamedRuleset) {
+        this.config.deleteNamedRuleset(oldName);
+      }
+    }
+    this.config.saveNamedRuleset(this.cloneRuleset(ruleset));
+    if (this.config.getNamedRuleset) {
+      const saved = this.config.getNamedRuleset(ruleset.name);
+      this.updateNamedRulesetInstances(ruleset.name, saved, undefined, root);
+    }
+  }
+
   private getAncestorNames(ruleset: RuleSet | null): string[] {
     const names: string[] = [];
     let current = ruleset;
@@ -1421,20 +1438,12 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       }
       const oldName = ruleset.name!;
       const root = this.getRootRuleset(ruleset);
-      if (oldName !== newName) {
-        if (this.renameCreatesCycle(oldName, newName, root)) {
-          this.dialog.open(MessageDialogComponent, { data: { title: 'Invalid name', message: 'Invalid name' } });
-          return;
-        }
-        this.renameNamedRulesetInstances(oldName, newName, ruleset, ruleset, root);
-        this.config.deleteNamedRuleset!(oldName);
-        ruleset.name = newName;
+      if (oldName !== newName && this.renameCreatesCycle(oldName, newName, root)) {
+        this.dialog.open(MessageDialogComponent, { data: { title: 'Invalid name', message: 'Invalid name' } });
+        return;
       }
-      this.config.saveNamedRuleset!(this.cloneRuleset(ruleset));
-      if (this.config.getNamedRuleset) {
-        const saved = this.config.getNamedRuleset(newName);
-        this.updateNamedRulesetInstances(newName, saved, undefined, root);
-      }
+      ruleset.name = newName;
+      this.saveNamedRulesetDefinition(ruleset, oldName);
       this.handleTouched();
       this.handleDataChange();
     });
@@ -1458,9 +1467,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
     ruleset.name = name;
     this.registerParentRefs(ruleset, QueryBuilderComponent.parentMap.get(ruleset) || null);
-    if (this.config.saveNamedRuleset) {
-      this.config.saveNamedRuleset(this.cloneRuleset(ruleset));
-    }
+    this.saveNamedRulesetDefinition(ruleset);
     this.namingRuleset = null;
     this.handleTouched();
     this.handleDataChange();
