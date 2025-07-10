@@ -1274,18 +1274,8 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   private renameNamedRulesetInstances(oldName: string, newName: string, source: RuleSet, skip?: RuleSet, root: RuleSet = this.data): void {
     const walk = (rs: RuleSet) => {
-      const parent = QueryBuilderComponent.parentMap.get(rs) || null;
-      if (rs !== skip && rs.name === oldName) {
-        const clone = this.cloneRuleset(source);
-        clone.name = newName;
-        if (parent) {
-          const idx = parent.rules.indexOf(rs);
-          parent.rules[idx] = clone;
-        } else if (rs === this.data) {
-          this.data = clone;
-        }
-        this.registerParentRefs(clone, parent);
-        rs = clone;
+      if (rs.name === oldName) {
+        rs.name = newName;
       }
       if (rs.rules) {
         rs.rules.forEach(child => {
@@ -1296,7 +1286,6 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       }
     };
     walk(root);
-    this.changeDetectorRef.detectChanges();
   }
 
   private renameCreatesCycle(oldName: string, newName: string, root: RuleSet = this.data): boolean {
