@@ -17,18 +17,18 @@ export interface NamedRulesetDialogResult {
   selector: 'lib-named-ruleset-dialog',
   standalone: false,
   template: `
-    <h1 mat-dialog-title>Save {{data.rulesetName}}</h1>
+    <h1 mat-dialog-title>Update {{data.rulesetName}}</h1>
     <div mat-dialog-content>
       <mat-form-field appearance="fill">
         <mat-label>{{data.rulesetName}} Name</mat-label>
-        <input matInput [(ngModel)]="name" />
+        <input matInput [(ngModel)]="name" (input)="onInput($event)" />
+        <button mat-icon-button matSuffix *ngIf="name" (click)="name = ''" type="button">✕</button>
       </mat-form-field>
       <div *ngIf="data.modified" class="q-modified-warning">Existing definition will be updated.</div>
     </div>
     <div mat-dialog-actions>
       <button mat-button (click)="dialogRef.close({action: 'cancel'})">Cancel</button>
-      <button mat-button color="warn" (click)="dialogRef.close({action: 'removeName'})">Remove Name</button>
-      <button mat-raised-button color="primary" [disabled]="!name" (click)="dialogRef.close({action: 'save', name})">Save</button>
+      <button mat-raised-button color="primary" (click)="dialogRef.close({action: 'save', name})">Update</button>
     </div>
   `
 })
@@ -39,5 +39,10 @@ export class NamedRulesetDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: NamedRulesetDialogData
   ) {
     this.name = data.name;
+  }
+
+  onInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.name = input.value.toUpperCase().replace(/ /g, '_').replace(/[^A-Z0-9_]/g, '');
   }
 }
