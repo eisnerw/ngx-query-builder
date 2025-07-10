@@ -1420,7 +1420,12 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   namedRulesetModified(ruleset: RuleSet): boolean {
     if (!ruleset.name || !this.config.getNamedRuleset) { return false; }
-    const saved = this.config.getNamedRuleset(ruleset.name);
+    let saved : RuleSet | null = null;
+    try {
+      saved = this.config.getNamedRuleset(ruleset.name);
+    } catch {
+      // ignore errors retrieving from store
+    }
     if (!saved) { return false; }
     const a = JSON.stringify({ ...ruleset, name: undefined });
     const b = JSON.stringify({ ...saved, name: undefined });
