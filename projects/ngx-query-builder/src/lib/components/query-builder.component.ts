@@ -1438,7 +1438,13 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
     const modified = this.namedRulesetModified(ruleset);
     this.dialog.open(NamedRulesetDialogComponent, {
-      data: { name: ruleset.name!, rulesetName: this.rulesetName, allowDelete: true, modified }
+      data: {
+        name: ruleset.name!,
+        rulesetName: this.rulesetName,
+        allowDelete: true,
+        modified,
+        rulesetNameSanitizer: this.config.rulesetNameSanitizer
+      }
     }).afterClosed().subscribe((result: NamedRulesetDialogResult | undefined) => {
       if (!result || result.action === 'cancel') { return; }
       if (result.action === 'removeName' || !result.name || result.name.trim() === '') {
@@ -1510,10 +1516,9 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   onNamingInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.namingRulesetName = input.value
-      .toUpperCase()
-      .replace(/ /g, '_')
-      .replace(/[^A-Z0-9_]/g, '');
+    const sanitizer = this.config.rulesetNameSanitizer ||
+      ((v: string) => v.toUpperCase().replace(/ /g, '_').replace(/[^A-Z0-9_]/g, ''));
+    this.namingRulesetName = sanitizer(input.value);
   }
 
   cancelNamingRuleset(): void {

@@ -6,6 +6,7 @@ export interface NamedRulesetDialogData {
   rulesetName: string;
   allowDelete: boolean;
   modified: boolean;
+  rulesetNameSanitizer?: (value: string) => string;
 }
 
 export interface NamedRulesetDialogResult {
@@ -24,7 +25,9 @@ export interface NamedRulesetDialogResult {
         <input matInput [(ngModel)]="name" (input)="onInput($event)" />
         <button mat-icon-button matSuffix *ngIf="name" (click)="name = ''" type="button">✕</button>
       </mat-form-field>
-      <div *ngIf="data.modified" class="q-modified-warning">Existing definition will be updated.</div>
+      <div *ngIf="data.modified" class="q-modified-warning">
+        {{ name.trim() === '' ? 'The name will be removed from the ' + data.rulesetName : 'Existing definition will be updated.' }}
+      </div>
     </div>
     <div mat-dialog-actions>
       <button mat-button (click)="dialogRef.close({action: 'cancel'})">Cancel</button>
@@ -43,6 +46,8 @@ export class NamedRulesetDialogComponent {
 
   onInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.name = input.value.toUpperCase().replace(/ /g, '_').replace(/[^A-Z0-9_]/g, '');
+    const sanitizer = this.data.rulesetNameSanitizer ||
+      ((v: string) => v.toUpperCase().replace(/ /g, '_').replace(/[^A-Z0-9_]/g, ''));
+    this.name = sanitizer(input.value);
   }
 }
