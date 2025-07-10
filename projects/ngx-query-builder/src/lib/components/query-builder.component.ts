@@ -1375,7 +1375,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
     const target = parent || this.data;
     const excluded = this.getAncestorNames(target);
-    const names = this.config.listNamedRulesets().filter(n => excluded.indexOf(n) === -1);
+    const names = this.config
+      .listNamedRulesets()
+      .filter(n => excluded.indexOf(n) === -1)
+      .sort();
     if (names.length === 0) {
       this.dialog.open(MessageDialogComponent, {
         data: { title: 'Named ' + this.rulesetName, message: 'No saved ' + this.rulesetName + 's available.' }
