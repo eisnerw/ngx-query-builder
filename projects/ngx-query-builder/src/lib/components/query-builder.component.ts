@@ -1419,11 +1419,26 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       if (result.action === 'removeName' || !result.name || result.name.trim() === '') {
         const name = ruleset.name as string;
         delete ruleset.name;
+        const finalize = () => {
+          this.handleTouched();
+          this.handleDataChange();
+        };
         if (!this.isRulesetNameInUse(name, this.getRootRuleset(ruleset))) {
-          this.config.deleteNamedRuleset!(name);
+          this.dialog.open(MessageDialogComponent, {
+            data: {
+              title: 'Delete Named ' + this.rulesetName + '?',
+              message: `The ${this.rulesetName} named "${name}" is no longer being used. Delete it?`,
+              confirm: true
+            }
+          }).afterClosed().subscribe((confirmDelete: boolean) => {
+            if (confirmDelete) {
+              this.config.deleteNamedRuleset!(name);
+            }
+            finalize();
+          });
+        } else {
+          finalize();
         }
-        this.handleTouched();
-        this.handleDataChange();
         return;
       }
       const newName = result.name.trim();
