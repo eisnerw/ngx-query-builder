@@ -1089,7 +1089,11 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   }
 
   private handleDataChange(): void {
-    this.changeDetectorRef.markForCheck();
+    // Force Angular to immediately update the view when the underlying
+    // query data changes. Using `detectChanges` ensures that updates
+    // originating outside the normal zone execution (such as dialog
+    // callbacks) properly refresh the UI in the same tick.
+    this.changeDetectorRef.detectChanges();
     if (this.onChangeCallback) {
       this.onChangeCallback();
     }
