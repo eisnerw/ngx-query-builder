@@ -1235,7 +1235,17 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     return JSON.parse(JSON.stringify(ruleset));
   }
 
-  private updateNamedRulesetInstances(name: string, source: RuleSet, skip?: RuleSet): void {
+  private getRootRuleset(ruleset: RuleSet = this.data): RuleSet {
+    let current = ruleset;
+    let parent = QueryBuilderComponent.parentMap.get(current);
+    while (parent) {
+      current = parent;
+      parent = QueryBuilderComponent.parentMap.get(current) || null;
+    }
+    return current;
+  }
+
+  private updateNamedRulesetInstances(name: string, source: RuleSet, skip?: RuleSet, root: RuleSet = this.data): void {
     const walk = (rs: RuleSet) => {
       const parent = QueryBuilderComponent.parentMap.get(rs) || null;
       if (rs !== skip && rs.name === name) {
@@ -1258,11 +1268,11 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         });
       }
     };
-    walk(this.data);
+    walk(root);
     this.changeDetectorRef.detectChanges();
   }
 
-  private renameNamedRulesetInstances(oldName: string, newName: string, source: RuleSet, skip?: RuleSet): void {
+  private renameNamedRulesetInstances(oldName: string, newName: string, source: RuleSet, skip?: RuleSet, root: RuleSet = this.data): void {
     const walk = (rs: RuleSet) => {
       const parent = QueryBuilderComponent.parentMap.get(rs) || null;
       if (rs !== skip && rs.name === oldName) {
@@ -1285,11 +1295,11 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         });
       }
     };
-    walk(this.data);
+    walk(root);
     this.changeDetectorRef.detectChanges();
   }
 
-  private renameCreatesCycle(oldName: string, newName: string): boolean {
+  private renameCreatesCycle(oldName: string, newName: string, root: RuleSet = this.data): boolean {
     let cycle = false;
     const check = (rs: RuleSet) => {
       if (cycle) { return; }
@@ -1308,7 +1318,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         });
       }
     };
-    check(this.data);
+    check(root);
     return cycle;
   }
 
@@ -1411,18 +1421,19 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       }
       const oldName = ruleset.name!;
       if (oldName !== newName) {
-        if (this.renameCreatesCycle(oldName, newName)) {
+        const root = this.getRootRuleset(ruleset);
+        if (this.renameCreatesCycle(oldName, newName, root)) {
           this.dialog.open(MessageDialogComponent, { data: { title: 'Invalid name', message: 'Invalid name' } });
           return;
         }
-        this.renameNamedRulesetInstances(oldName, newName, ruleset, ruleset);
+        this.renameNamedRulesetInstances(oldName, newName, ruleset, ruleset, root);
         this.config.deleteNamedRuleset!(oldName);
         ruleset.name = newName;
       }
       this.config.saveNamedRuleset!(this.cloneRuleset(ruleset));
       if (this.config.getNamedRuleset) {
         const saved = this.config.getNamedRuleset(newName);
-        this.updateNamedRulesetInstances(newName, saved);
+        this.updateNamedRulesetInstances(newName, saved, undefined, root);
       }
       this.handleTouched();
       this.handleDataChange();
