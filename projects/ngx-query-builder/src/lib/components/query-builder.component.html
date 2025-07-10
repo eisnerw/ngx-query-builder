@@ -19,6 +19,9 @@
         <span class="q-name-label" [ngClass]="{'q-name-modified': namedRulesetModified(data)}">{{data.name}}</span>
       </button>
 
+      <span *ngIf="collapsed && config.customCollapsedSummary" [ngClass]="getClassNames('collapsedSummary')">
+        {{ config.customCollapsedSummary(data) }}
+      </span>
       <ng-template [ngTemplateOutlet]="_buttonGroupTpl"/>
     </div>
 
@@ -136,9 +139,6 @@
           <ng-template #blankOr><span class="q-switch-label-empty">OR</span></ng-template>
         </label>
       </div>
-      <span *ngIf="collapsed && config.customCollapsedSummary" [ngClass]="getClassNames('collapsedSummary')">
-        {{ config.customCollapsedSummary(data) }}
-      </span>
     </div>
   </ng-template>
 </ng-template>
@@ -158,13 +158,13 @@
       <div class="q-buttons">
       <ng-container *ngIf="!config.rulesLimit || data.rules.length < config.rulesLimit">
         <ng-container *ngTemplateOutlet="_rulesetAddRuleButtonTpl"></ng-container>
+        <ng-container *ngIf="!config.levelLimit || level + 1 < config.levelLimit">
+          <ng-container *ngTemplateOutlet="_rulesetAddRulesetButtonTpl"></ng-container>
+        </ng-container>
         <button *ngIf="config.listNamedRulesets && config.getNamedRuleset" type="button"
                 (click)="addNamedRuleSet()" [ngClass]="getClassNames('button')" [disabled]="disabled">
           <i [ngClass]="getClassNames('addIcon')"></i> Named {{rulesetName}}
         </button>
-        <ng-container *ngIf="!config.levelLimit || level + 1 < config.levelLimit">
-          <ng-container *ngTemplateOutlet="_rulesetAddRulesetButtonTpl"></ng-container>
-        </ng-container>
       </ng-container>
       <ng-container *ngIf="allowRuleUpDown && parentValue && parentValue.rules.length > 1">
         <button type="button" (click)="moveRuleUp(data, parentValue)" [ngClass]="getClassNames('button')"
