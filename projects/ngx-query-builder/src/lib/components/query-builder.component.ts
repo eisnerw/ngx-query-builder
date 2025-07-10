@@ -1259,6 +1259,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       }
     };
     walk(this.data);
+    this.changeDetectorRef.detectChanges();
   }
 
   private renameNamedRulesetInstances(oldName: string, newName: string, source: RuleSet, skip?: RuleSet): void {
@@ -1285,6 +1286,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       }
     };
     walk(this.data);
+    this.changeDetectorRef.detectChanges();
   }
 
   private renameCreatesCycle(oldName: string, newName: string): boolean {
