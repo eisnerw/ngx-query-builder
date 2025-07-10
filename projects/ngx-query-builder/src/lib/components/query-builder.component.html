@@ -58,7 +58,7 @@
                             [disabled]="disabled || i === data.rules.length - 1">
                       <i [ngClass]="getClassNames('downIcon')"></i>
                     </button>
-                    <button *ngIf="allowConvertToRuleset" type="button" (click)="convertToRuleset(rule, data)" [title]="'Convert to a ' + rulesetName" [ngClass]="getClassNames('button')" [disabled]="disabled">
+                    <button *ngIf="allowConvertToRuleset" type="button" (click)="convertToRuleset(rule, data)" [title]="'Convert to a ' + rulesetName + ' containing this ' + ruleName" [ngClass]="getClassNames('button')" [disabled]="disabled">
                       <svg [ngClass]="getClassNames('equalIcon')" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
                         <path d="M1 3h10v2H1zM1 7h10v2H1z"/>
                       </svg>
@@ -177,7 +177,7 @@
         </button>
       </ng-container>
       <button *ngIf="allowConvertToRuleset && parentValue && data.rules.length === 1" type="button"
-              (click)="convertRulesetToRule(data, parentValue)" [title]="'Convert to a ' + ruleName" [ngClass]="getClassNames('button')" [disabled]="disabled">
+              (click)="convertRulesetToRule(data, parentValue)" [title]="'Embed this  ' + ruleName + ' in it\s parent\'s ' + rulesetName" [ngClass]="getClassNames('button')" [disabled]="disabled">
         <svg [ngClass]="getClassNames('equalIcon')" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
           <path d="M1 3h10v2H1zM1 7h10v2H1z"/>
         </svg>
