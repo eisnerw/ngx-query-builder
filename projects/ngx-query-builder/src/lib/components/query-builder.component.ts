@@ -1413,17 +1413,17 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       data: { name: ruleset.name!, rulesetName: this.rulesetName, allowDelete: true, modified }
     }).afterClosed().subscribe((result: NamedRulesetDialogResult | undefined) => {
       if (!result || result.action === 'cancel') { return; }
-      if (result.action === 'removeName') {
+      if (result.action === 'removeName' || !result.name || result.name.trim() === '') {
         const name = ruleset.name as string;
         delete ruleset.name;
-        if (!this.isRulesetNameInUse(name, this.getRootRuleset(ruleset))){
+        if (!this.isRulesetNameInUse(name, this.getRootRuleset(ruleset))) {
           this.config.deleteNamedRuleset!(name);
         }
         this.handleTouched();
         this.handleDataChange();
         return;
       }
-      const newName = result.name!.trim();
+      const newName = result.name.trim();
       if (!this.isValidRulesetName(newName, ruleset)) {
         this.dialog.open(MessageDialogComponent, { data: { title: 'Invalid name', message: 'Invalid name' } });
         return;
@@ -1467,7 +1467,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   onNamingInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.namingRulesetName = input.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+    this.namingRulesetName = input.value
+      .toUpperCase()
+      .replace(/ /g, '_')
+      .replace(/[^A-Z0-9_]/g, '');
   }
 
   cancelNamingRuleset(): void {
