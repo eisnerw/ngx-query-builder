@@ -198,6 +198,17 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   public namingRuleset: RuleSet | null = null;
   public namingRulesetName = '';
 
+  private clearContextCaches(): void {
+    this.inputContextCache.clear();
+    this.operatorContextCache.clear();
+    this.fieldContextCache.clear();
+    this.entityContextCache.clear();
+    this.rulesetAddRuleButtonContextCache.clear();
+    this.rulesetAddRulesetButtonContextCache.clear();
+    this.rulesetRemoveButtonContextCache.clear();
+    this.ruleRemoveButtonContextCache.clear();
+  }
+
   constructor(private changeDetectorRef: ChangeDetectorRef,
               private dialog: MatDialog) { }
 
@@ -242,6 +253,12 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       }
     }
 
+    if (changes['data'] && !changes['data'].isFirstChange()) {
+      this.clearContextCaches();
+      this.registerParentRefs(this.data, this.parentValue || null);
+      this.handleDataChange();
+    }
+
     // Handle allowNot changes
     if (changes['allowNot']) {
       this.updateNotProperty(this.data, this.allowNot);
@@ -279,6 +296,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   set value(value: RuleSet) {
     // When component is initialized without a formControl, null is passed to value
     this.data = value || { condition: 'and', rules: [] };
+    this.clearContextCaches();
     this.registerParentRefs(this.data, this.parentValue || null);
     this.handleDataChange();
   }
