@@ -281,6 +281,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     // When component is initialized without a formControl, null is passed to value
     this.data = value || { condition: 'and', rules: [] };
     this.registerParentRefs(this.data, this.parentValue || null);
+    this.storeUnstoredNamedRulesets(this.data);
     this.handleDataChange();
   }
 
@@ -1234,6 +1235,25 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
 
   private cloneRuleset(ruleset: RuleSet): RuleSet {
     return JSON.parse(JSON.stringify(ruleset));
+  }
+
+  private storeUnstoredNamedRulesets(root: RuleSet): void {
+    if (!this.config.saveNamedRuleset || !this.config.listNamedRulesets) { return; }
+    const stored = new Set(this.config.listNamedRulesets() || []);
+    const walk = (rs: RuleSet) => {
+      if (rs.name && !stored.has(rs.name)) {
+        this.config.saveNamedRuleset!(this.cloneRuleset(rs));
+        stored.add(rs.name);
+      }
+      if (rs.rules) {
+        rs.rules.forEach(child => {
+          if (this.isRuleset(child)) {
+            walk(child);
+          }
+        });
+      }
+    };
+    walk(root);
   }
 
   private getRootRuleset(ruleset: RuleSet = this.data): RuleSet {
