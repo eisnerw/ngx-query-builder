@@ -48,7 +48,8 @@ import {
   SimpleChanges,
   TemplateRef,
   ViewChild,
-  ElementRef
+  ElementRef,
+  booleanAttribute
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddNamedRulesetDialogComponent } from './add-named-ruleset-dialog.component';
@@ -1288,6 +1289,17 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     walk(root);
   }
 
+  private isRulesetNameInUse(name: string, root: RuleSet = this.data): boolean {
+    const walk = (rs: RuleSet): boolean => {
+      if (rs.name === name) return true;
+      if (rs.rules) {
+        return rs.rules.some(child => this.isRuleset(child) && walk(child));
+      }
+      return false;
+    };
+    return walk(root);
+  }
+
   private renameCreatesCycle(oldName: string, newName: string, root: RuleSet = this.data): boolean {
     let cycle = false;
     const check = (rs: RuleSet) => {
@@ -1401,21 +1413,12 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       data: { name: ruleset.name!, rulesetName: this.rulesetName, allowDelete: true, modified }
     }).afterClosed().subscribe((result: NamedRulesetDialogResult | undefined) => {
       if (!result || result.action === 'cancel') { return; }
-      if (result.action === 'delete') {
-        this.dialog.open(MessageDialogComponent, {
-          data: { title: 'Confirm', message: 'Delete named ' + this.rulesetName + ' ' + ruleset.name + '?', confirm: true }
-        }).afterClosed().subscribe((confirmed: boolean) => {
-          if (confirmed) {
-            this.config.deleteNamedRuleset!(ruleset.name!);
-            delete ruleset.name;
-            this.handleTouched();
-            this.handleDataChange();
-          }
-        });
-        return;
-      }
       if (result.action === 'removeName') {
+        const name = ruleset.name as string;
         delete ruleset.name;
+        if (!this.isRulesetNameInUse(name, this.getRootRuleset(ruleset))){
+          this.config.deleteNamedRuleset!(name);
+        }
         this.handleTouched();
         this.handleDataChange();
         return;
