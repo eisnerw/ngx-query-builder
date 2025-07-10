@@ -1167,8 +1167,20 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   }
 
   private cleanData(data: RuleSet): RuleSet {
+    let source = data;
+    if (data.name && this.config.getNamedRuleset) {
+      try {
+        const stored = this.config.getNamedRuleset(data.name);
+        if (stored) {
+          source = { ...JSON.parse(JSON.stringify(stored)), name: data.name };
+        }
+      } catch {
+        // ignore errors retrieving from store
+      }
+    }
+
     // Create a deep copy to avoid modifying the original data
-    const cleanedData = JSON.parse(JSON.stringify(data));
+    const cleanedData = JSON.parse(JSON.stringify(source));
     
     // Remove 'not' property if allowNot is false
     if (!this.allowNot && cleanedData.hasOwnProperty('not')) {
