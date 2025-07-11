@@ -252,6 +252,7 @@ export class AppComponent implements OnInit {
         validate: (rs: any) => this.validateRuleset(rs)
       },
       width: '800px',
+      panelClass: 'resizable-dialog',
       autoFocus: false
     }).afterClosed());
   }

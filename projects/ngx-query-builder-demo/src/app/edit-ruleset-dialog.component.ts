@@ -14,14 +14,14 @@ export interface EditRulesetDialogData {
   template: `
     <h1 mat-dialog-title>Edit {{data.rulesetName}}</h1>
     <div mat-dialog-content>
-      <textarea class="output" [ngClass]="state" [(ngModel)]="text" (ngModelChange)="onChange($event)"></textarea>
+      <textarea class="output dialog-output" [ngClass]="state" [(ngModel)]="text" (ngModelChange)="onChange($event)"></textarea>
     </div>
     <div mat-dialog-actions>
       <button mat-button (click)="dialogRef.close()">Cancel</button>
       <button mat-raised-button color="primary" [disabled]="state !== 'valid'" (click)="save()">Save</button>
     </div>
   `,
-  styleUrls: ['./app.component.less']
+  styleUrls: ['./app.component.less', './edit-ruleset-dialog.component.less']
 })
 export class EditRulesetDialogComponent {
   text: string;
