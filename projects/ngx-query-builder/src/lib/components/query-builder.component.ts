@@ -163,6 +163,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   @Input() parentChangeCallback!: () => void;
   @Input() parentTouchedCallback!: () => void;
   @Input() persistValueOnFieldChange = false;
+  @Input() defaultRuleAttribute: string | null = null;
 
   @ViewChild('treeContainer', {static: true}) treeContainer!: ElementRef;
   public collapsed = false;
@@ -457,9 +458,15 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     if (this.config.addRule) {
       this.config.addRule(parent);
     } else {
-      const field = this.fields[0];
+      let field = this.fields[0];
+      if (this.defaultRuleAttribute) {
+        const match = this.fields.find(f => f.value === this.defaultRuleAttribute);
+        if (match) {
+          field = match;
+        }
+      }
       if (field.value) {
-        parent.rules = parent.rules.concat([{
+        parent.rules = parent.rules.concat([{ 
           field: field.value,
           operator: this.getDefaultOperator(field) || '',
           value: this.getDefaultValue(field.defaultValue),
@@ -565,6 +572,34 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
 
     parent.rules.splice(index, 1, ruleset.rules[0]);
+
+    this.handleTouched();
+    this.handleDataChange();
+  }
+
+  wrapRuleset(ruleset?: RuleSet, parent?: RuleSet | null): void {
+    if (this.disabled) {
+      return;
+    }
+
+    ruleset = ruleset || this.data;
+    parent = parent !== undefined ? parent : this.parentValue || null;
+
+    const wrapper: RuleSet = { condition: 'and', rules: [ruleset] };
+    if (this.allowNot) {
+      wrapper.not = false;
+    }
+
+    if (parent) {
+      const idx = parent.rules.indexOf(ruleset);
+      if (idx === -1) { return; }
+      parent.rules.splice(idx, 1, wrapper);
+      this.registerParentRefs(wrapper, parent);
+    } else if (ruleset === this.data) {
+      this.data = wrapper;
+      this.registerParentRefs(wrapper, null);
+    }
+    this.registerParentRefs(ruleset, wrapper);
 
     this.handleTouched();
     this.handleDataChange();

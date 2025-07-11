@@ -349,6 +349,7 @@
 
   .q-name-action-modified {
     border: 2px solid #B3415D;
+    background: rgba(179, 65, 93, 0.1);
   }
 
   .q-name-label {

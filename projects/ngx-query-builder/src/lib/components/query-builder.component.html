@@ -14,7 +14,7 @@
       </span>
       <span *ngIf="!data.name && config.saveNamedRuleset && !isRulesetInvalid(data) && namingRuleset !== data" class="q-name-text" (click)="startNamingRuleset(data)">Click to name {{rulesetName}}</span>
 
-      <button *ngIf="data.name && config.getNamedRuleset && config.saveNamedRuleset && config.deleteNamedRuleset" type="button" class="q-name-action" (click)="namedRulesetAction(data)" [ngClass]="getClassNames('button')" [disabled]="disabled" [title]="namedRulesetModified(data) ? rulesetName + ' has been modified needs to be saved, renamed or unnamed' : null">
+      <button *ngIf="data.name && config.getNamedRuleset && config.saveNamedRuleset && config.deleteNamedRuleset" type="button" class="q-name-action" (click)="namedRulesetAction(data)" [ngClass]="getClassNames('button')" [class.q-name-action-modified]="namedRulesetModified(data)" [disabled]="disabled" [title]="namedRulesetModified(data) ? rulesetName + ' has been modified needs to be saved, renamed or unnamed' : null">
         <i [ngClass]="getClassNames(namedRulesetModified(data) ? 'saveIcon' : 'searchIcon')"></i>
         <span class="q-name-label" [ngClass]="{'q-name-modified': namedRulesetModified(data)}">{{data.name}}</span>
       </button>
@@ -182,6 +182,13 @@
           <path d="M1 3h10v2H1zM1 7h10v2H1z"/>
         </svg>
         {{ruleName}}
+      </button>
+      <button *ngIf="allowConvertToRuleset" type="button"
+              (click)="wrapRuleset(data, parentValue)" [title]="'Wrap this ' + rulesetName + ' in another ' + rulesetName" [ngClass]="getClassNames('button')" [disabled]="disabled">
+        <svg [ngClass]="getClassNames('equalIcon')" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+          <path d="M1 3h10v2H1zM1 7h10v2H1z"/>
+        </svg>
+        {{rulesetName}}
       </button>
       <ng-container *ngIf="!!parentValue">
         <ng-container *ngTemplateOutlet="_rulesetRemoveButtonTpl"></ng-container>

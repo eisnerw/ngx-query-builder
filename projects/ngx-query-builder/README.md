@@ -130,6 +130,7 @@ config: QueryBuilderConfig = {
 |`allowRuleUpDown`| `boolean` |Optional| `false` | Displays up and down arrows on rules and nested rulesets for reordering. |
 |`ruleName`| `string` |Optional| `'Rule'` | Label used in default buttons for rules. |
 |`rulesetName`| `string` |Optional| `'Ruleset'` | Label used in default buttons for rulesets. |
+|`defaultRuleAttribute`| `string` |Optional| | Name of the field to use as the default when adding new rules. |
 |`allowNot`| `boolean` |Optional| `false`                          | Adds a `NOT` button and sets a `not` attribute on the ruleset JSON. |
 |`classNames`| [`QueryBuilderClassNames`](/projects/ngx-query-builder/src/lib/models/query-builder.interfaces.ts#L48)                                                                      |Optional|                                  | CSS class names for different child elements in `query-builder` component. |
 |`config`| [`QueryBuilderConfig`](/projects/ngx-query-builder/src/lib/models/query-builder.interfaces.ts#L85)                                                                          |Required|                                  | Configuration object for the main component. |
