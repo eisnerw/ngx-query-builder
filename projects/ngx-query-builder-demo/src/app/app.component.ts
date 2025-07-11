@@ -1,6 +1,9 @@
 import { FormBuilder, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { firstValueFrom } from 'rxjs';
 import { QueryBuilderClassNames, QueryBuilderConfig, RuleSet, Rule } from 'ngx-query-builder';
+import { EditRulesetDialogComponent } from './edit-ruleset-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -241,6 +244,18 @@ export class AppComponent implements OnInit {
     delete this.namedRulesets[name];
   }
 
+  editNamedRuleset(ruleset: RuleSet): Promise<RuleSet | null> {
+    return firstValueFrom(this.dialog.open(EditRulesetDialogComponent, {
+      data: {
+        ruleset: JSON.parse(JSON.stringify(ruleset)),
+        rulesetName: this.rulesetName,
+        validate: (rs: any) => this.validateRuleset(rs)
+      },
+      width: '800px',
+      autoFocus: false
+    }).afterClosed());
+  }
+
   updateNamedRulesetsUsage() {
     if (this.useSavedRulesets) {
       this.currentConfig = {
@@ -248,7 +263,8 @@ export class AppComponent implements OnInit {
         listNamedRulesets: this.listNamedRulesets.bind(this),
         getNamedRuleset: this.getNamedRuleset.bind(this),
         saveNamedRuleset: this.saveNamedRuleset.bind(this),
-        deleteNamedRuleset: this.deleteNamedRuleset.bind(this)
+        deleteNamedRuleset: this.deleteNamedRuleset.bind(this),
+        editNamedRuleset: this.editNamedRuleset.bind(this)
       } as QueryBuilderConfig;
     } else {
       const {
@@ -256,6 +272,7 @@ export class AppComponent implements OnInit {
         getNamedRuleset,
         saveNamedRuleset,
         deleteNamedRuleset,
+        editNamedRuleset,
         ...rest
       } = this.currentConfig as any;
       this.currentConfig = rest;
@@ -270,7 +287,8 @@ export class AppComponent implements OnInit {
   }
 
   constructor(
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private dialog: MatDialog
   ) {
     this.queryCtrl = this.formBuilder.control(this.query);
     this.currentConfig = this.config;

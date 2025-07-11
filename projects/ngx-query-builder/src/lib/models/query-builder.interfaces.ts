@@ -113,6 +113,7 @@ export interface QueryBuilderConfig {
   getNamedRuleset?: (name: string) => RuleSet;
   saveNamedRuleset?: (ruleset: RuleSet) => void;
   deleteNamedRuleset?: (name: string) => void;
+  editNamedRuleset?: (ruleset: RuleSet) => Promise<RuleSet | null> | RuleSet | null;
   rulesetNameSanitizer?: (value: string) => string;
 }
 

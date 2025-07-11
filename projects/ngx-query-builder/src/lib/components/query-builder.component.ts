@@ -1478,6 +1478,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         rulesetName: this.rulesetName,
         allowDelete: true,
         modified,
+        allowEdit: !!this.config.editNamedRuleset,
         rulesetNameSanitizer: this.config.rulesetNameSanitizer
       }
     }).afterClosed().subscribe((result: NamedRulesetDialogResult | undefined) => {
@@ -1496,6 +1497,21 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         }
         this.handleTouched();
         this.handleDataChange();
+        return;
+      }
+      if (result.action === 'edit' && this.config.editNamedRuleset) {
+        Promise.resolve(this.config.editNamedRuleset(this.cloneRuleset(ruleset)))
+          .then(edited => {
+            if (edited) {
+              const parent = QueryBuilderComponent.parentMap.get(ruleset) || null;
+              Object.keys(ruleset).forEach(k => delete (ruleset as any)[k]);
+              Object.assign(ruleset, edited);
+              this.registerParentRefs(ruleset, parent);
+              this.saveNamedRulesetDefinition(ruleset);
+            }
+            this.handleTouched();
+            this.handleDataChange();
+          });
         return;
       }
       if (result.action === 'removeName' || !result.name || result.name.trim() === '') {
