@@ -7,10 +7,11 @@ export interface NamedRulesetDialogData {
   allowDelete: boolean;
   modified: boolean;
   rulesetNameSanitizer?: (value: string) => string;
+  allowEdit?: boolean;
 }
 
 export interface NamedRulesetDialogResult {
-  action: 'save' | 'delete' | 'cancel' | 'removeName' | 'undo';
+  action: 'save' | 'delete' | 'cancel' | 'removeName' | 'undo' | 'edit';
   name?: string;
 }
 
@@ -38,6 +39,7 @@ export interface NamedRulesetDialogResult {
     <div mat-dialog-actions>
       <button mat-button (click)="dialogRef.close({action: 'cancel'})">Cancel</button>
       <button mat-button *ngIf="data.modified" (click)="dialogRef.close({action: 'undo'})">Undo</button>
+      <button mat-button *ngIf="data.allowEdit" (click)="dialogRef.close({action: 'edit'})">Edit</button>
       <button mat-raised-button color="primary" [disabled]="isUpdateDisabled()" (click)="dialogRef.close({action: 'save', name})">Update</button>
     </div>
   `
