@@ -2,3 +2,21 @@
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Make the Edit Ruleset dialog resizable and keep the editor fixed */
+.edit-ruleset-dialog .mat-mdc-dialog-container {
+  resize: both;
+  overflow: auto;
+  max-height: none !important;
+}
+
+.edit-ruleset-dialog .mat-mdc-dialog-content {
+  height: 100%;
+}
+
+.edit-ruleset-dialog .output {
+  resize: none;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
