@@ -10,6 +10,7 @@ export interface EditRulesetDialogData {
 
 @Component({
   selector: 'app-edit-ruleset-dialog',
+  standalone: false,
   template: `
     <h1 mat-dialog-title>Edit {{data.rulesetName}}</h1>
     <div mat-dialog-content>
